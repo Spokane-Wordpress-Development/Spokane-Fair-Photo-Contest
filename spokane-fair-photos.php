@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: Photo Submission Plugin for the Spokane Interstate Fair
+ * Plugin Name: Spokane Interstate Fair Photo Submissions
  * Plugin URI: http://8feetacross.com/spokane-interstate-fair-photo-contest/
  * Description: A custom plugin for the Spokane Interstate Fair Photo Contest
  * Author: Spokane WordPress Development
@@ -40,17 +40,20 @@ add_action( 'init', array( $controller, 'init' ) );
 add_action ( 'init', array( $controller, 'form_capture' ) );
 
 /* register shortcode */
-add_shortcode ( 'spokane_fair_photo_contest', array( $controller, 'short_code' ) );
+add_shortcode ( 'spokane_fair_photos', array( $controller, 'short_code' ) );
 
 /* admin stuff */
 if (is_admin() )
 {
 	/* Add main menu and sub-menus */
-	add_action( 'admin_menu', array( $nitro_k9_controller, 'admin_menus') );
+	add_action( 'admin_menu', array( $controller, 'admin_menus') );
 
 	/* register settings */
-	add_action( 'admin_init', array( $nitro_k9_controller, 'register_settings' ) );
+	add_action( 'admin_init', array( $controller, 'register_settings' ) );
 
 	/* admin scripts */
-	add_action( 'admin_init', array( $nitro_k9_controller, 'admin_scripts' ) );
+	add_action( 'admin_init', array( $controller, 'admin_scripts' ) );
+
+	/* add the settings page link */
+	add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $controller, 'settings_link' ) );
 }
