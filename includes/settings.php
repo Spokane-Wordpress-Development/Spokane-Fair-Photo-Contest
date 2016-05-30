@@ -61,27 +61,27 @@
 			<tr valign="top">
 				<th scope="row">
 					<label for="spokane_fair_start_date">
-						Entries Open Date
+						Entries Open On
 					</label>
 				</th>
 				<td>
-					<?php echo ( $this->getStartDate() == '' ) ? 'Open Immediately' : ''; ?>
+					<?php echo ( $this->getStartDate() == '' ) ? 'Open Immediately' : $this->getStartDate( 'l, F j, Y' ); ?>
 				</td>
 				<td>
-					<input type="text" id="spokane_fair_start_date" name="spokane_fair_start_date" placeholder="mm/dd/yyyy">
+					<input type="text" id="spokane_fair_start_date" name="spokane_fair_start_date" value="<?php echo $this->getStartDate(); ?>" placeholder="mm/dd/yyyy">
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row">
 					<label for="spokane_fair_end_date">
-						Entries Close Date
+						Entries Close On
 					</label>
 				</th>
 				<td>
-					<?php echo ( $this->getEndDate() == '' ) ? 'Open Indefinitely' : ''; ?>
+					<?php echo ( $this->getEndDate() == '' ) ? 'Open Indefinitely' : $this->getEndDate( 'l, F j, Y' ); ?>
 				</td>
 				<td>
-					<input type="text" id="spokane_fair_end_date" name="spokane_fair_end_date" value="" placeholder="mm/dd/yyyy">
+					<input type="text" id="spokane_fair_end_date" name="spokane_fair_end_date" value="<?php echo $this->getEndDate(); ?>" placeholder="mm/dd/yyyy">
 				</td>
 			</tr>
 		</table>
