@@ -10,7 +10,55 @@ class Controller {
 
 	public function activate()
 	{
-		
+		require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
+		global $wpdb;
+
+		/* create tables */
+		$charset_collate = '';
+		if ( ! empty( $wpdb->charset ) )
+		{
+			$charset_collate .= "DEFAULT CHARACTER SET " . $wpdb->charset;
+		}
+		if ( ! empty( $wpdb->collate ) )
+		{
+			$charset_collate .= " COLLATE " . $wpdb->collate;
+		}
+
+		/* categories table */
+		$table = $wpdb->prefix . Category::TABLE_NAME;
+		if( $wpdb->get_var( "SHOW TABLES LIKE '" . $table . "'" ) != $table ) {
+			$sql = "
+				CREATE TABLE `" . $table . "`
+				(
+					`id` INT(11) NOT NULL AUTO_INCREMENT,
+					`code` VARCHAR(50) DEFAULT NULL,
+					`title` VARCHAR(50) DEFAULT NULL,
+					`is_visible` TINYINT(4) DEFAULT NULL,
+					PRIMARY KEY (`id`)
+				)";
+			$sql .= $charset_collate . ";"; // new line to avoid PHP Storm syntax error
+			dbDelta( $sql );
+		}
+
+		/* entries table */
+		$table = $wpdb->prefix . Entry::TABLE_NAME;
+		if( $wpdb->get_var( "SHOW TABLES LIKE '" . $table . "'" ) != $table ) {
+			$sql = "
+				CREATE TABLE `" . $table . "`
+				(
+					`id` INT(11) NOT NULL AUTO_INCREMENT,
+					`photographer_id` INT(11) DEFAULT NULL,
+					`category_id` INT(11) DEFAULT NULL,
+					`code` VARCHAR(50) DEFAULT NULL,
+					`title` VARCHAR(50) DEFAULT NULL,
+					`created_at` DATETIME DEFAULT NULL,
+					PRIMARY KEY (`id`),
+					KEY `photographer_id` (`photographer_id`),
+					KEY `category_id` (`category_id`)
+				)";
+			$sql .= $charset_collate . ";"; // new line to avoid PHP Storm syntax error
+			dbDelta( $sql );
+		}
 	}
 
 	public function init()
@@ -84,6 +132,8 @@ class Controller {
 	{
 		wp_enqueue_media();
 		add_thickbox();
+		wp_enqueue_script( 'spokane-fair-admin', plugin_dir_url( dirname( __DIR__ ) ) . 'js/admin.js', array( 'jquery' ), ( WP_DEBUG ) ? time() : self::VERSION_JS, TRUE );
+		wp_localize_script( 'spokane-fair-admin', 'url_variables', $_GET );
 	}
 
 	/**
@@ -134,5 +184,31 @@ class Controller {
 	public function print_submissions_page()
 	{
 		include( dirname( dirname( __DIR__ ) ) . '/includes/submissions.php' );
+	}
+
+	public function add_category()
+	{
+		$category = new Category;
+		$category
+			->setCode( $_REQUEST['code'] )
+			->setTitle( $_REQUEST['title'] )
+			->setIsVisible( $_REQUEST['is_visible'] )
+			->create();
+	}
+
+	public function update_category()
+	{
+		$category = new Category( $_REQUEST['id'] );
+		$category
+			->setCode( $_REQUEST['code'] )
+			->setTitle( $_REQUEST['title'] )
+			->setIsVisible( $_REQUEST['is_visible'] )
+			->update();
+	}
+
+	public function delete_category()
+	{
+		$category = new Category( $_REQUEST['id'] );
+		$category->delete();
 	}
 }

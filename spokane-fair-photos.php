@@ -27,6 +27,11 @@
  */
 
 require_once ( 'classes/SpokaneFair/Controller.php' );
+require_once ( 'classes/SpokaneFair/Category.php' );
+require_once ( 'classes/SpokaneFair/CategoryTable.php' );
+require_once ( 'classes/SpokaneFair/Entry.php' );
+require_once ( 'classes/SpokaneFair/Payment.php' );
+require_once ( 'classes/SpokaneFair/Photographer.php' );
 
 $controller = new \SpokaneFair\Controller;
 
@@ -56,4 +61,19 @@ if (is_admin() )
 
 	/* add the settings page link */
 	add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $controller, 'settings_link' ) );
+
+	add_action( 'wp_ajax_spokane_fair_category_add', function() use ( $controller ) 
+	{
+		$controller->add_category();
+	} );
+
+	add_action( 'wp_ajax_spokane_fair_category_update', function() use ( $controller )
+	{
+		$controller->update_category();
+	} );
+
+	add_action( 'wp_ajax_spokane_fair_category_delete', function() use ( $controller )
+	{
+		$controller->delete_category();
+	} );
 }
