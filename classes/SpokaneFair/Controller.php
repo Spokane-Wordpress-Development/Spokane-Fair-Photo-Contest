@@ -83,6 +83,7 @@ class Controller {
 		add_menu_page( 'Spokane Fair', 'Spokane Fair', 'manage_options', 'spokane_fair_photos', array( $this, 'print_settings_page' ), 'dashicons-format-gallery' );
 		add_submenu_page( 'spokane_fair_photos', 'Settings', 'Settings', 'manage_options', 'spokane_fair_photos' );
 		add_submenu_page( 'spokane_fair_photos', 'Categories', 'Categories', 'manage_options', 'spokane_fair_categories', array( $this, 'print_categories_page' ) );
+		add_submenu_page( 'spokane_fair_photos', 'Photographers', 'Photographers', 'manage_options', 'spokane_fair_photographers', array( $this, 'print_photographers_page' ) );
 		add_submenu_page( 'spokane_fair_photos', 'Submissions', 'Submissions', 'manage_options', 'spokane_fair_submissions', array( $this, 'print_submissions_page' ) );
 	}
 	
@@ -176,6 +177,14 @@ class Controller {
 	public function print_categories_page()
 	{
 		include( dirname( dirname( __DIR__ ) ) . '/includes/categories.php' );
+	}
+
+	/**
+	 *
+	 */
+	public function print_photographers_page()
+	{
+		include( dirname( dirname( __DIR__ ) ) . '/includes/photographers.php' );
 	}
 
 	/**

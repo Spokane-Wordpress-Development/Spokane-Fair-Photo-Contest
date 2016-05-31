@@ -1,7 +1,7 @@
 <div class="wrap">
 
 	<h1>
-		Spokane Interstate Fair Photo Submission Submissions
+		Spokane Interstate Fair Photo Submissions
 	</h1>
 	
 

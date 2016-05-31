@@ -149,7 +149,7 @@ if ( isset( $_GET[ 'action' ] ) )
 	<?php } else { ?>
 
 		<h1>
-			Spokane Interstate Fair Photo Submission Categories
+			Spokane Interstate Fair Photo Categories
 			<a href="?page=<?php echo $_REQUEST['page']; ?>&action=add" class="page-title-action">
 				Add Category
 			</a>
