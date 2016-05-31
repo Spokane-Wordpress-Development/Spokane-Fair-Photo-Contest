@@ -14,8 +14,8 @@ class Photographer {
 	/** @var Entry[] $entries */
 	private $entries;
 
-	/** @var Payment[] $payments */
-	private $payments;
+	/** @var Order[] $orders */
+	private $orders;
 
 	/**
 	 * @return mixed
@@ -183,38 +183,38 @@ class Photographer {
 	}
 
 	/**
-	 * @return Payment[]
+	 * @return Order[]
 	 */
-	public function getPayments()
+	public function getOrders()
 	{
-		return ( $this->payments === NULL ) ? array() : $this->payments;
+		return ( $this->orders === NULL ) ? array() : $this->orders;
 	}
 
 	/**
-	 * @param Payment[] $payments
+	 * @param Order[] $orders
 	 *
 	 * @return Photographer
 	 */
-	public function setPayments( $payments )
+	public function setOrders( $orders )
 	{
-		$this->payments = $payments;
+		$this->orders = $orders;
 
 		return $this;
 	}
 
 	/**
-	 * @param Payment $payment
+	 * @param Order $order
 	 *
 	 * @return $this
 	 */
-	public function addPayment( Payment $payment )
+	public function addOrder( $order )
 	{
-		if ( $this->payments === NULL )
+		if ( $this->orders === NULL )
 		{
-			$this->payments = array();
+			$this->orders = array();
 		}
 
-		$this->payments[ $payment->getId() ] = $payment;
+		$this->orders[ $order->getId() ] = $order;
 
 		return $this;
 	}
@@ -226,9 +226,9 @@ class Photographer {
 	{
 		$count = 0;
 
-		foreach ( $this->getPayments() as $payment )
+		foreach ( $this->getOrders() as $order )
 		{
-			$count += $payment->getEntries();
+			$count += $order->getEntries();
 		}
 		
 		return $count;
