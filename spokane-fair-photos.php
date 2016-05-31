@@ -30,7 +30,7 @@ require_once ( 'classes/SpokaneFair/Controller.php' );
 require_once ( 'classes/SpokaneFair/Category.php' );
 require_once ( 'classes/SpokaneFair/CategoryTable.php' );
 require_once ( 'classes/SpokaneFair/Entry.php' );
-require_once ( 'classes/SpokaneFair/Payment.php' );
+require_once ( 'classes/SpokaneFair/Order.php' );
 require_once ( 'classes/SpokaneFair/Photographer.php' );
 
 $controller = new \SpokaneFair\Controller;
