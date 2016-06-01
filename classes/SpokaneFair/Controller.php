@@ -8,6 +8,55 @@ class Controller {
 	const VERSION_JS = '1.0.0';
 	const VERSION_CSS = '1.0.0';
 
+	private $errors;
+	
+	/** @var Photographer $photographer */
+	private $photographer;
+
+	/**
+	 * @return mixed
+	 */
+	public function getErrors()
+	{
+		return ( $this->errors === NULL ) ? array() : $this->errors;
+	}
+
+	/**
+	 * @param $error
+	 *
+	 * @return $this
+	 */
+	public function addError( $error )
+	{
+		if( $this->errors === NULL )
+		{
+			$this->errors = array();
+		}
+		
+		$this->errors[] = $error;
+		return $this;
+	}
+
+	/**
+	 * @return Photographer
+	 */
+	public function getPhotographer()
+	{
+		return $this->photographer;
+	}
+
+	/**
+	 * @param Photographer $photographer
+	 *
+	 * @return Controller
+	 */
+	public function setPhotographer( $photographer )
+	{
+		$this->photographer = $photographer;
+
+		return $this;
+	}
+
 	public function activate()
 	{
 		require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
@@ -59,23 +108,182 @@ class Controller {
 			$sql .= $charset_collate . ";"; // new line to avoid PHP Storm syntax error
 			dbDelta( $sql );
 		}
+		
+		/* orders table */
+		$table = $wpdb->prefix . Order::TABLE_NAME;
+		if( $wpdb->get_var( "SHOW TABLES LIKE '" . $table . "'" ) != $table ) {
+			$sql = "
+				CREATE TABLE `" . $table . "`
+				(
+					`id` INT(11) NOT NULL AUTO_INCREMENT,
+					`photographer_id` INT(11) DEFAULT NULL,
+					`amount` DECIMAL(11,2) DEFAULT NULL,
+					`entries` INT(11) DEFAULT NULL,
+					`created_at` DATETIME DEFAULT NULL,
+					`paid_at` DATETIME DEFAULT NULL,
+					PRIMARY KEY (`id`),
+					KEY `photographer_id` (`photographer_id`)
+				)";
+			$sql .= $charset_collate . ";"; // new line to avoid PHP Storm syntax error
+			dbDelta( $sql );
+		}
 	}
 
 	public function init()
 	{
 		add_thickbox();
+		wp_enqueue_style( 'spokane-fair-fa', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_JS, TRUE );
 		wp_enqueue_script( 'spokane-fair-js', plugin_dir_url( dirname( __DIR__ )  ) . 'js/spokane-fair.js', array( 'jquery' ), ( WP_DEBUG ) ? time() : self::VERSION_JS, TRUE );
 		wp_enqueue_style( 'spokane-fair-bootstrap-css', plugin_dir_url( dirname( __DIR__ ) ) . 'css/bootstrap.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_CSS );
+
+		if ( $this->photographer === NULL )
+		{
+			$this->photographer = Photographer::load_from_user();
+		}
 	}
 	
 	public function form_capture()
 	{
-		
+		if ( isset( $_POST['spokane_fair_action'] ) )
+		{
+			if ( isset( $_POST['spokane_fair_nonce'] ) && wp_verify_nonce( $_POST['spokane_fair_nonce'], 'spokane_fair_' . $_POST['spokane_fair_action'] ) )
+			{
+				switch ( $_POST['spokane_fair_action'] )
+				{
+					case 'register':
+
+						if ( empty( $_POST['username'] ) || empty( $_POST['password'] ) || empty( $_POST['email'] ) || empty( $_POST['fname'] ) || empty( $_POST['lname'] ) || empty( $_POST['state'] ) || empty( $_POST['phone'] ) )
+						{
+							$this->addError( 'Please fill out all required fields' );
+						}
+
+						elseif ( 4 > strlen( $_POST['username'] ) )
+						{
+							$this->addError( 'Username too short. At least 4 characters is required' );
+						}
+
+						elseif ( username_exists( $_POST['username'] ) )
+						{
+							$this->addError( 'Sorry, that username already exists' );
+						}
+
+						elseif ( ! validate_username( $_POST['username'] ) )
+						{
+							$this->addError( 'Sorry, the username you entered is not valid' );
+						}
+
+						elseif ( 5 > strlen( $_POST['password'] ) )
+						{
+							$this->addError( 'Password length must be greater than 5' );
+						}
+
+						elseif ( ! is_email( $_POST['email'] ) )
+						{
+							$this->addError( 'Email is not valid' );
+						}
+
+						elseif ( email_exists( $_POST['email'] ) )
+						{
+							$this->addError( 'That email address is already in use' );
+						}
+
+						if ( count( $this->getErrors() ) == 0 )
+						{
+							$user_data = array(
+								'user_login' => $_POST['username'],
+								'user_email' => $_POST['email'],
+								'user_pass' => $_POST['password'],
+								'first_name' => $_POST['fname'],
+								'last_name' => $_POST['lname']
+							);
+							$user_id = wp_insert_user( $user_data );
+							update_user_meta( $user_id, 'state', $_SESSION['state'] );
+							update_user_meta( $user_id, 'phone', $_POST['phone'] );
+
+							header( 'Location:' . $this->add_to_querystring( array( 'action' => 'registered' ), TRUE ) );
+							exit;
+						}
+
+						break;
+
+					case 'purchase':
+
+						$entries = ( isset( $_POST['entries'] ) && is_numeric( $_POST['entries'] ) ) ? intval( $_POST['entries'] ) : 0;
+						if ( $entries == 0 )
+						{
+							$this->addError( 'Please enter a valid number of entries' );
+						}
+						else
+						{
+							$price = 0;
+							$y = 0;
+							for ( $x=1; $x<=$entries; $x++ )
+							{
+								$y++;
+								$price += $this->getPricePerEntry();
+
+								if ( $y % $this->getNumberFreeAt() == 0 )
+								{
+									$y=0;
+									$x += $this->getFreeQty();
+								}
+							}
+
+							$order = new Order;
+							$order
+								->setPhotographerId( $this->getPhotographer()->getId() )
+								->setAmount( $price )
+								->setEntries( $entries )
+								->setPaidAt( ( $price == 0 ) ? time() : NULL )
+								->create();
+
+							header( 'Location:' . $this->add_to_querystring( array( 'action' => 'ordered' ), TRUE ) );
+							exit;
+						}
+
+						break;
+				}
+			}
+			else
+			{
+				$this->addError( 'It appears you are submitting this form from a different website' );
+			}
+		}
+	}
+
+	public function add_to_querystring( array $args, $remove_old_query_string=FALSE )
+	{
+		$url = $_SERVER['REQUEST_URI'];
+		$parts = explode( '?', $url );
+		$url = $parts[0];
+		$querystring = array();
+		if ( count( $parts ) > 1 )
+		{
+			$parts = explode( '&', $parts[1] );
+			foreach ( $parts as $part )
+			{
+				if ( ! $remove_old_query_string || substr( $part, 0, 3 ) == 'id=' )
+				{
+					$querystring[] = $part;
+				}
+			}
+		}
+
+		foreach ( $args as $key => $val )
+		{
+			$querystring[] = $key . '=' . $val;
+		}
+
+		return $url . ( ( count( $querystring ) > 0 ) ? '?' . implode( '&', $querystring ) : '' );
 	}
 	
 	public function short_code()
 	{
-		
+		ob_start();
+		include( dirname( dirname( __DIR__ ) ) . '/includes/shortcode.php');
+		$output = ob_get_contents();
+		ob_end_clean();
+		return $output;
 	}
 
 	public function admin_menus()
@@ -127,6 +335,18 @@ class Controller {
 	{
 		$end_date = get_option( 'spokane_fair_end_date' , '' );
 		return ( strlen( $end_date ) == 0 ) ? '' : date( $format, strtotime( $end_date ) );
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function canSubmitEntry()
+	{
+		$today = strtotime( date( 'Y-m-d' ) );
+		$start = ( $this->getStartDate() == '' ) ? $today : strtotime( $this->getStartDate() );
+		$end = ( $this->getEndDate() == '' ) ? $today : strtotime( $this->getEndDate() );
+
+		return ( $today >= $start && $today <= $end );
 	}
 	
 	public function admin_scripts()
@@ -219,5 +439,30 @@ class Controller {
 	{
 		$category = new Category( $_REQUEST['id'] );
 		$category->delete();
+	}
+
+	public function extra_profile_fields()
+	{
+		include( dirname( dirname( __DIR__ ) ) . '/includes/user_fields.php' );
+	}
+
+	public function save_extra_profile_fields()
+	{
+		if ( !current_user_can( 'edit_user', $_POST['user_id'] ) )
+		{
+			return FALSE;
+		}
+
+		if ( isset( $_POST['state'] ) )
+		{
+			update_user_meta( $_POST['user_id'], 'state', $_POST['state'] );
+		}
+
+		if ( isset( $_POST['phone'] ) )
+		{
+			update_user_meta( $_POST['user_id'], 'phone', $_POST['phone'] );
+		}
+
+		return TRUE;
 	}
 }

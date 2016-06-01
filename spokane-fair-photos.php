@@ -61,6 +61,12 @@ if (is_admin() )
 
 	/* add the settings page link */
 	add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $controller, 'settings_link' ) );
+	
+	/* extra user fields */
+	add_action( 'show_user_profile', array( $controller, 'extra_profile_fields' ) );
+	add_action( 'edit_user_profile', array( $controller, 'extra_profile_fields' ) );
+	add_action( 'personal_options_update', array( $controller, 'save_extra_profile_fields' ) );
+	add_action( 'edit_user_profile_update', array( $controller, 'save_extra_profile_fields' ) );
 
 	add_action( 'wp_ajax_spokane_fair_category_add', function() use ( $controller ) 
 	{

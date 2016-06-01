@@ -4,12 +4,94 @@ namespace SpokaneFair;
 
 class Order {
 
+	const TABLE_NAME = 'spokane_fair_orders';
+
 	private $id;
 	private $photographer_id;
 	private $amount;
 	private $entries;
 	private $created_at;
 	private $paid_at;
+
+	public function create()
+	{
+		global $wpdb;
+
+		$this->setCreatedAt( time() );
+
+		$wpdb->insert(
+			$wpdb->prefix . self::TABLE_NAME,
+			array(
+				'photographer_id' => $this->photographer_id,
+				'amount' => $this->amount,
+				'entries' => $this->entries,
+				'created_at' => $this->getCreatedAt( 'Y-m-d H:i:s' ),
+				'paid_at' => ( $this->paid_at === NULL ) ? NULL : $this->getPaidAt( 'Y-m-d H:i:s' )
+			),
+			array(
+				'%d',
+				'%d',
+				'%f',
+				'%s',
+				'%s'
+			)
+		);
+
+		$this->setId( $wpdb->insert_id );
+	}
+
+	public function read()
+	{
+
+	}
+	
+	public function loadFromRow( \stdClass $row )
+	{
+		$this
+			->setId( $row->id )
+			->setPhotographerId( $row->photographer_id )
+			->setAmount( $row->amount )
+			->setEntries( $row->entries )
+			->setCreatedAt( $row->created_at )
+			->setPaidAt( $row->paid_at );
+	}
+
+	public function update()
+	{
+		global $wpdb;
+
+		if ( $this->id !== NULL )
+		{
+			$wpdb->update(
+				$wpdb->prefix . self::TABLE_NAME,
+				array(
+					'photographer_id' => $this->photographer_id,
+					'amount' => $this->amount,
+					'entries' => $this->entries,
+					'created_at' => $this->getCreatedAt( 'Y-m-d H:i:s' ),
+					'paid_at' => ( $this->paid_at === NULL ) ? NULL : $this->getPaidAt( 'Y-m-d H:i:s' )
+				),
+				array(
+					'id' => $this->id
+				),
+				array(
+					'%d',
+					'%d',
+					'%f',
+					'%s',
+					'%s'
+				),
+				array(
+					'%d'
+				)
+			);
+		}
+	}
+
+	public function delete()
+	{
+
+	}
 
 	/**
 	 * @return mixed
@@ -109,7 +191,7 @@ class Order {
 	/**
 	 * @param mixed $created_at
 	 *
-	 * @return Entry
+	 * @return Order
 	 */
 	public function setCreatedAt( $created_at )
 	{
@@ -143,5 +225,37 @@ class Order {
 		$this->paid_at = ( $paid_at === NULL || is_numeric( $paid_at ) ) ? $paid_at : strtotime( $paid_at );
 
 		return $this;
+	}
+
+	/**
+	 * @param int $photographer_id
+	 *
+	 * @return Order[]
+	 */
+	public static function getPhotographerOrders( $photographer_id )
+	{
+		global $wpdb;
+		$photographer_id = ( is_numeric( $photographer_id ) ) ? intval( $photographer_id ) : 0;
+		$orders = array();
+		
+		$sql = $wpdb->prepare("
+			SELECT
+				*
+			FROM
+				" . $wpdb->prefix . self::TABLE_NAME . "
+			WHERE
+				photographer_id = %d",
+			$photographer_id
+		);
+
+		$rows = $wpdb->get_results( $sql );
+		foreach( $rows as $row )
+		{
+			$order = new Order;
+			$order->loadFromRow( $row );
+			$orders[ $order->getId() ] = $order;
+		}
+
+		return $orders;
 	}
 }

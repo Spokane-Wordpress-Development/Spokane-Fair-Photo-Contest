@@ -5,6 +5,7 @@ namespace SpokaneFair;
 class Photographer {
 
 	private $id;
+	private $username;
 	private $first_name;
 	private $last_name;
 	private $email;
@@ -33,6 +34,26 @@ class Photographer {
 	public function setId( $id )
 	{
 		$this->id = ( is_numeric( $id ) ) ? intval( $id ) : NULL;
+
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getUsername()
+	{
+		return ( $this->username === NULL ) ? '' : $this->username;
+	}
+
+	/**
+	 * @param mixed $username
+	 *
+	 * @return Photographer
+	 */
+	public function setUsername( $username )
+	{
+		$this->username = $username;
 
 		return $this;
 	}
@@ -222,7 +243,7 @@ class Photographer {
 	/**
 	 * @return int|mixed
 	 */
-	public function getEntriesPaidForCount()
+	public function getEntriesOrderedCount()
 	{
 		$count = 0;
 
@@ -232,6 +253,32 @@ class Photographer {
 		}
 		
 		return $count;
+	}
+
+	/**
+	 * @return int|mixed
+	 */
+	public function getPaidEntryCount()
+	{
+		$count = 0;
+
+		foreach ( $this->getOrders() as $order )
+		{
+			if ( $order->getPaidAt() !== NULL )
+			{
+				$count += $order->getEntries();
+			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * @return int|mixed
+	 */
+	public function getUnpaidEntryCount()
+	{
+		return $this->getEntriesOrderedCount() - $this->getPaidEntryCount();
 	}
 
 	/**
@@ -247,7 +294,54 @@ class Photographer {
 	 */
 	public function getEntriesLeftCount()
 	{
-		return $this->getEntriesPaidForCount() - $this->getEntriesUsedCount();
+		return $this->getEntriesOrderedCount() - $this->getEntriesUsedCount();
 	}
 
+	/**
+	 * @return $this
+	 */
+	public function loadEntries()
+	{
+		return $this;
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function loadOrders()
+	{
+		if ( $this->id !== NULL )
+		{
+			$this->orders = Order::getPhotographerOrders( $this->id );
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @return null|Photographer
+	 */
+	public static function load_from_user()
+	{
+		if ( is_user_logged_in() )
+		{
+			$current_user = wp_get_current_user();
+
+			$photographer = new Photographer;
+			$photographer
+				->setId( $current_user->ID )
+				->setUsername( $current_user->user_login )
+				->setFirstName( $current_user->user_firstname )
+				->setLastName( $current_user->user_lastname )
+				->setEmail( $current_user->user_email )
+				->setState( get_user_meta ( $current_user->ID, 'state', TRUE ) )
+				->setPhone( get_user_meta ( $current_user->ID, 'phone', TRUE ) )
+				->loadEntries()
+				->loadOrders();
+
+			return $photographer;
+		}
+
+		return NULL;
+	}
 }
