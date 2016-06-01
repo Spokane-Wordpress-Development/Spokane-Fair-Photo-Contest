@@ -302,6 +302,7 @@ class Controller {
 		register_setting( 'spokane_fair_settings', 'spokane_fair_free_qty' );
 		register_setting( 'spokane_fair_settings', 'spokane_fair_start_date' );
 		register_setting( 'spokane_fair_settings', 'spokane_fair_end_date' );
+		register_setting( 'spokane_fair_settings', 'spokane_fair_paypal_email' );
 	}
 
 	public function getPricePerEntry()
@@ -335,6 +336,12 @@ class Controller {
 	{
 		$end_date = get_option( 'spokane_fair_end_date' , '' );
 		return ( strlen( $end_date ) == 0 ) ? '' : date( $format, strtotime( $end_date ) );
+	}
+	
+	public function getPayPalEmail()
+	{
+		$email = get_option( 'spokane_fair_paypal_email' , '' );
+		return ( is_email( $email ) ) ? $email : '';
 	}
 
 	/**

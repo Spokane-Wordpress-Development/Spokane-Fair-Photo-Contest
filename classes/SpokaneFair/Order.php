@@ -218,7 +218,7 @@ class Order {
 	/**
 	 * @param mixed $paid_at
 	 *
-	 * @return Entry
+	 * @return Order
 	 */
 	public function setPaidAt( $paid_at )
 	{

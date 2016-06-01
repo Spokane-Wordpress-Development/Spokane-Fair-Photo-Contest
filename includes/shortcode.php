@@ -1,5 +1,7 @@
 <?php
 
+/** @var \SpokaneFair\Controller $this */
+
 $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 
 ?>
@@ -119,7 +121,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 						<p>
 							<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ), TRUE ); ?>">
 								<i class="fa fa-camera"></i>
-								Submit a New Photo
+								Submit a Photo Entry
 							</a>
 						</p>
 					<?php } ?>
@@ -143,7 +145,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
 						<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ), TRUE ); ?>">
 							<i class="fa fa-camera"></i>
-							Submit a New Photo
+							Submit a Photo Entry
 						</a>
 					<?php } ?>
 				</p>
@@ -164,16 +166,20 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 							<td>$<?php echo number_format( $order->getAmount(), 2 ); ?></td>
 							<td>
 								<?php if ( $order->getPaidAt() === NULL ) { ?>
-									<form name="_xclick" action="https://www.paypal.com/uk/cgi-bin/webscr" method="post">
-										<input type="hidden" name="cmd" value="_xclick">
-										<input type="hidden" name="business" value="spokanetony@gmail.com">
-										<input type="hidden" name="currency_code" value="USD">
-										<input type="hidden" name="item_name" value="P<?php echo $this->getPhotographer()->getId(); ?>O<?php echo $order->getId(); ?>">
-										<input type="hidden" name="amount" value="<?php echo $order->getAmount(); ?>">
-										<input type="hidden" name="return" value="<?php echo get_site_url() . $this->add_to_querystring( array( 'action' => 'ordered', 'paid' => $order->getId() ), TRUE ); ?>">
-										<input type="hidden" name="cancel_return" value="<?php echo get_site_url() . $this->add_to_querystring( array( 'action' => 'ordered' ), TRUE ); ?>">
-										<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/x-click-but06.gif" border="0" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
-									</form>
+									<?php if ( $this->getPayPalEmail() == '' ) { ?>
+										Website payments are currently offline. Please check back later.
+									<?php } else { ?>
+										<form name="_xclick" action="https://www.paypal.com/uk/cgi-bin/webscr" method="post">
+											<input type="hidden" name="cmd" value="_xclick">
+											<input type="hidden" name="business" value="<?php echo $this->getPayPalEmail(); ?>">
+											<input type="hidden" name="currency_code" value="USD">
+											<input type="hidden" name="item_name" value="P<?php echo $this->getPhotographer()->getId(); ?>O<?php echo $order->getId(); ?>">
+											<input type="hidden" name="amount" value="<?php echo $order->getAmount(); ?>">
+											<input type="hidden" name="return" value="<?php echo get_site_url() . $this->add_to_querystring( array( 'action' => 'ordered', 'paid' => $order->getId() ), TRUE ); ?>">
+											<input type="hidden" name="cancel_return" value="<?php echo get_site_url() . $this->add_to_querystring( array( 'action' => 'ordered' ), TRUE ); ?>">
+											<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/x-click-but06.gif" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
+										</form>
+									<?php } ?>
 								<?php } else { ?>
 									Paid on <?php echo $order->getPaidAt( 'n/j/Y' ); ?>
 								<?php } ?>
@@ -227,24 +233,30 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					</td>
 				</tr>
 			<?php } ?>
-			<tr>
-				<th>Entries Used</th>
-				<td><?php echo $this->getPhotographer()->getEntriesUsedCount(); ?></td>
-				<td>
-					<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'entries' ) ); ?>">
-						<i class="fa fa-eye"></i>
-						View Entries
-					</a>
-				</td>
-			</tr>
+			<?php if ( $this->getPhotographer()->getEntriesUsedCount() > 0 ) { ?>
+				<tr>
+					<th>Entries Used</th>
+					<td>
+						<?php echo $this->getPhotographer()->getEntriesUsedCount(); ?>/<?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?>
+					</td>
+					<td>
+						<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'entries' ) ); ?>">
+							<i class="fa fa-eye"></i>
+							View Entries
+						</a>
+					</td>
+				</tr>
+			<?php } ?>
 			<tr>
 				<th>Entries Left</th>
-				<td><?php echo $this->getPhotographer()->getEntriesLeftCount(); ?></td>
+				<td>
+					<?php echo $this->getPhotographer()->getEntriesLeftCount(); ?>/<?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?>
+				</td>
 				<td>
 					<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
 						<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ) ); ?>">
 							<i class="fa fa-camera"></i>
-							Submit a New Photo
+							Submit a Photo Entry
 						</a>
 					<?php } ?>
 				</td>

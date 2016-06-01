@@ -1,5 +1,7 @@
 <?php
 
+/** @var \SpokaneFair\Controller $this */
+
 $action = 'list';
 if ( isset( $_GET[ 'action' ] ) )
 {

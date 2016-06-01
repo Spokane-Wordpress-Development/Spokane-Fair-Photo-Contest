@@ -1,3 +1,9 @@
+<?php
+
+/** @var \SpokaneFair\Controller $this */
+
+?>
+
 <div class="wrap">
 
 	<h1>
@@ -82,6 +88,19 @@
 				</td>
 				<td>
 					<input type="text" id="spokane_fair_end_date" name="spokane_fair_end_date" value="<?php echo $this->getEndDate(); ?>" placeholder="mm/dd/yyyy">
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">
+					<label for="spokane_fair_end_date">
+						PayPal Email
+					</label>
+				</th>
+				<td>
+					<?php echo ( $this->getPayPalEmail() == '' ) ? 'None' : $this->getPayPalEmail(); ?>
+				</td>
+				<td>
+					<input type="text" id="spokane_fair_paypal_email" name="spokane_fair_paypal_email" value="<?php echo $this->getPayPalEmail(); ?>">
 				</td>
 			</tr>
 		</table>

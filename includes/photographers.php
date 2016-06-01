@@ -1,3 +1,9 @@
+<?php
+
+/** @var \SpokaneFair\Controller $this */
+
+?>
+
 <div class="wrap">
 
 	<h1>
