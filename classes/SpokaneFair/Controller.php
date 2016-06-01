@@ -140,6 +140,7 @@ class Controller {
 		wp_enqueue_style( 'spokane-fair-fa', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_JS, TRUE );
 		wp_enqueue_script( 'spokane-fair-js', plugin_dir_url( dirname( __DIR__ )  ) . 'js/spokane-fair.js', array( 'jquery' ), ( WP_DEBUG ) ? time() : self::VERSION_JS, TRUE );
 		wp_enqueue_style( 'spokane-fair-bootstrap-css', plugin_dir_url( dirname( __DIR__ ) ) . 'css/bootstrap.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_CSS );
+		wp_enqueue_style( 'spokane-fair-css', plugin_dir_url( dirname( __DIR__ ) ) . 'css/spokane-fair.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_CSS );
 
 		add_image_size( self::IMG_THUMB , 200, 200 );
 		add_image_size( self::IMG_FULL , 1920, 1080 );
@@ -253,23 +254,106 @@ class Controller {
 
 					case 'submit':
 
-						$category_id = $_POST['category_id'];
-						$title = trim( $_POST['title'] );
+					$category_id = $_POST['category_id'];
+					$title = trim( $_POST['title'] );
+
+					if ( strlen( $title ) == 0 )
+					{
+						$this->addError( 'Please enter a title' );
+					}
+					elseif ( ! isset( $_FILES['file'] ) || empty( $_FILES['file']['tmp_name'] ) )
+					{
+						$this->addError( 'Please choose a file to upload' );
+					}
+					elseif ( strtolower( substr(  $_FILES['file']['name'], -4 ) ) != '.jpg' )
+					{
+						$this->addError( 'Please choose file ending in .jpg' );
+					}
+
+					if ( count( $this->errors ) == 0 )
+					{
+						$image = getimagesize( $_FILES['file']['tmp_name'] );
+						if ( $image[0] < 1920 || $image[1] < 1080 )
+						{
+							$this->addError( 'Photos must be at least 1920 X 1080 pixels. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+						}
+					}
+
+					if ( count( $this->errors ) == 0 )
+					{
+						$file = wp_upload_bits( $_FILES['file']['name'], NULL, @file_get_contents( $_FILES['file']['tmp_name'] ) );
+
+						if ( ! $file['error'] )
+						{
+							$wp_filetype = wp_check_filetype( $_FILES['file']['name'], NULL );
+							$attachment = array(
+								'post_mime_type' => $wp_filetype['type'],
+								'post_parent' => 0,
+								'post_title' => preg_replace( '/\.[^.]+$/', '', $_FILES['file']['name'] ),
+								'post_content' => '',
+								'post_status' => 'inherit'
+							);
+							$attachment_id = wp_insert_attachment( $attachment, $file['file'], 0 );
+							if ( ! is_wp_error( $attachment_id ) )
+							{
+								require_once( ABSPATH . 'wp-admin' . '/includes/image.php');
+								$attachment_data = wp_generate_attachment_metadata( $attachment_id, $file['file'] );
+								wp_update_attachment_metadata( $attachment_id,  $attachment_data );
+
+								$entry = new Entry;
+								$entry
+									->setPhotographerId( $this->getPhotographer()->getId() )
+									->setCategoryId( $category_id )
+									->setTitle( $title )
+									->setPhotoPostId( $attachment_id )
+									->create();
+
+								if ( $entry->getId() !== NULL )
+								{
+									header( 'Location:' . $this->add_to_querystring( array( 'action' => 'entries', 'new' => 'true' ), TRUE ) );
+									exit;
+								}
+							}
+						}
+
+						$this->addError( 'There was a problem uploading your photo. Please try again.' );
+					}
+
+					break;
+
+				case 'edit':
+
+					$id = ( is_numeric( $_POST['id'] ) ) ? intval( $_POST['id'] ) : 0;
+					$delete = $_POST['delete'];
+					$category_id = $_POST['category_id'];
+					$title = trim( $_POST['title'] );
+
+					$entry = new Entry( $id );
+
+					if ( $entry->getId() === NULL || $entry->getPhotographerId() != $this->getPhotographer()->getId() )
+					{
+						$this->addError( 'You do not have access to modify this entry' );
+					}
+
+					if ( count( $this->errors ) == 0 )
+					{
+						if ( $delete == 1 )
+						{
+							$entry->delete();
+							header( 'Location:' . $this->add_to_querystring( array( 'action'  => 'entries', 'deleted' => 'true' ), TRUE ) );
+							exit;
+						}
 
 						if ( strlen( $title ) == 0 )
 						{
 							$this->addError( 'Please enter a title' );
 						}
-						elseif ( ! isset( $_FILES['file'] ) || empty( $_FILES['file']['tmp_name'] ) )
-						{
-							$this->addError( 'Please choose a file to upload' );
-						}
-						elseif ( strtolower( substr(  $_FILES['file']['name'], -4 ) ) != '.jpg' )
+						elseif ( ! empty( $_FILES['file']['tmp_name'] && strtolower( substr(  $_FILES['file']['name'], -4 ) ) != '.jpg' ) )
 						{
 							$this->addError( 'Please choose file ending in .jpg' );
 						}
 
-						if ( count( $this->errors ) == 0 )
+						if ( count( $this->errors ) == 0 && ! empty( $_FILES['file']['tmp_name'] ) )
 						{
 							$image = getimagesize( $_FILES['file']['tmp_name'] );
 							if ( $image[0] < 1920 || $image[1] < 1080 )
@@ -278,7 +362,7 @@ class Controller {
 							}
 						}
 
-						if ( count( $this->errors ) == 0 )
+						if ( count( $this->errors ) == 0 && ! empty( $_FILES['file']['tmp_name'] ) )
 						{
 							$file = wp_upload_bits( $_FILES['file']['name'], NULL, @file_get_contents( $_FILES['file']['tmp_name'] ) );
 
@@ -299,26 +383,32 @@ class Controller {
 									$attachment_data = wp_generate_attachment_metadata( $attachment_id, $file['file'] );
 									wp_update_attachment_metadata( $attachment_id,  $attachment_data );
 
-									$entry = new Entry;
-									$entry
-										->setPhotographerId( $this->getPhotographer()->getId() )
-										->setCategoryId( $category_id )
-										->setTitle( $title )
-										->setPhotoPostId( $attachment_id )
-										->create();
-
-									if ( $entry->getId() !== NULL )
-									{
-										header( 'Location:' . $this->add_to_querystring( array( 'action' => 'entries', 'new' => 'true' ), TRUE ) );
-										exit;
-									}
+									$entry->setPhotoPostId( $attachment_id );
+								}
+								else
+								{
+									$this->addError( 'There was a problem uploading your photo. Please try again.' );
 								}
 							}
-
-							$this->addError( 'There was a problem uploading your photo. Please try again.' );
+							else
+							{
+								$this->addError( 'There was a problem uploading your photo. Please try again.' );
+							}
 						}
 
-						break;
+						if ( count( $this->errors ) == 0 )
+						{
+							$entry
+								->setTitle( $title )
+								->setCategoryId( $category_id )
+								->update();
+
+							header( 'Location:' . $this->add_to_querystring( array( 'action'  => 'entries', 'updated' => 'true' ), TRUE ) );
+							exit;
+						}
+					}
+
+					break;
 				}
 			}
 			else

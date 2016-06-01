@@ -194,6 +194,84 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 		
 	<?php } elseif ( $action == 'entries' ) { ?>
 
+		<?php if ( isset( $_GET['new'] ) ) { ?>
+
+			<div class="alert alert-info">
+				Your entry has been submitted. You can view and manage it below.
+			</div>
+
+		<?php } ?>
+
+		<?php if ( $this->getPhotographer()->getEntriesOrderedCount() > 0 ) { ?>
+
+			<p>
+				You have submitted
+				<strong>
+					<?php echo $this->getPhotographer()->getEntriesUsedCount(); ?>
+				</strong>
+				of
+				<strong>
+					<?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?>
+				</strong>
+				purchased entries.
+			</p>
+
+			<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
+				<p>
+					<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ), TRUE ); ?>">
+						<i class="fa fa-camera"></i>
+						Upload Another Photo
+					</a>
+				</p>
+			<?php } ?>
+
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>Photo / Code</th>
+						<th>Title / Category</th>
+						<?php if ( $this->canSubmitEntry() ) { ?>
+							<th>Manage</th>
+						<?php } ?>
+					</tr>
+				</thead>
+				<?php foreach ( $this->getPhotographer()->getEntries() as $entry ) { ?>
+					<?php
+
+					$thumb = wp_get_attachment_image( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_THUMB );
+					$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), 'full' );
+
+					?>
+					<tr>
+						<td>
+							<span class="spokane-fair-image" data-image="<?php echo $full[0]; ?>"><?php echo $thumb; ?></span>
+							<br>
+							<?php echo $entry->getCode(); ?>
+						</td>
+						<td>
+							<p>
+								<strong>Title</strong><br>
+								<?php echo $entry->getTitle(); ?>
+							</p>
+							<p>
+								<strong>Category</strong><br>
+								<?php echo $entry->getCategory()->getTitle(); ?>
+							</p>
+						</td>
+						<?php if ( $this->canSubmitEntry() ) { ?>
+							<td>
+								<a href="<?php echo $this->add_to_querystring( array( 'action' => 'edit', 'entry_id' => $entry->getId() ), TRUE ); ?>" class="btn btn-default">
+									<i class="fa fa-edit"></i>
+									Edit
+								</a>
+							</td>
+						<?php } ?>
+					</tr>
+				<?php } ?>
+			</table>
+
+		<?php } ?>
+
 	<?php } elseif ( $action == 'submit' ) { ?>
 
 		<?php $categories = \SpokaneFair\Category::getAllVisibleCategories(); ?>
@@ -210,7 +288,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 				</p>
 			</div>
 
-		<?php } elseif ( count( $categories ) == 0 ) { ?>
+		<?php } elseif ( count( $categories ) == 0 || ! $this->canSubmitEntry() ) { ?>
 			
 			<div class="alert alert-danger">
 				Photo uploading is currently offline. Please check back later.
@@ -270,9 +348,108 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					</form>
 
 				</div>
-				
+
 			</div>
 			
+		<?php } ?>
+
+	<?php } elseif ( $action == 'edit' ) { ?>
+
+		<?php
+
+		$id = ( isset( $_GET['entry_id'] ) && is_numeric( $_GET['entry_id'] ) ) ? intval( $_GET['entry_id'] ) : 0;
+		$categories = \SpokaneFair\Category::getAllVisibleCategories();
+		$entry = new \SpokaneFair\Entry( $id );
+
+		?>
+
+		<?php if ( $entry->getId() === NULL || $entry->getPhotographerId() !== $this->getPhotographer()->getId() ) { ?>
+
+			<div class="alert alert-danger">
+				<p>You do not have access to manage this entry.</p>
+			</div>
+
+		<?php } elseif ( count( $categories ) == 0 || ! $this->canSubmitEntry() ) { ?>
+
+			<div class="alert alert-danger">
+				Entry managing is currently offline. Please check back later.
+			</div>
+
+		<?php } else { ?>
+
+			<div class="alert alert-info">
+				<strong>Note:</strong>
+				Photos must be at least 1920 X 1080 pixels and must be a JPG format.
+			</div>
+
+			<div class="row">
+				<div class="col-md-8">
+
+					<form method="post" enctype="multipart/form-data" id="sf_submit_entry_form">
+
+						<?php wp_nonce_field( 'spokane_fair_edit', 'spokane_fair_nonce' ); ?>
+						<input type="hidden" name="spokane_fair_action" value="edit">
+						<input type="hidden" name="id" value="<?php echo $entry->getId(); ?>">
+						<input type="hidden" name="delete" value="0" id="spokane_fair_delete_field">
+
+						<div class="form-group">
+							<label for="sf_category_id">
+								Choose a Category
+							</label>
+							<select class="form-control" name="category_id" id="sf_category_id">
+								<?php foreach ( $categories as $category ) { ?>
+									<option value="<?php echo $category->getId(); ?>"<?php if ( $entry->getCategoryId() == $category->getId() ) { ?> selected<?php } ?>>
+										<?php echo $category->getTitle(); ?>
+									</option>
+								<?php } ?>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label for="sf_title">
+								Title of Photo
+							</label>
+							<input class="form-control" name="title" id="sf_title" value="<?php echo esc_html( $entry->getTitle() ); ?>">
+						</div>
+
+						<div class="form-group">
+							<label for="sf_file">
+								Upload a New Photo
+							</label>
+							<input type="file" name="file" id="sf_file" class="form-control">
+						</div>
+
+						<div class="well">
+							<button id="sf_submit_entry_edit" class="btn btn-default">
+								Update
+							</button>
+							<button id="sf_submit_entry_delete" class="btn btn-danger">
+								Delete
+							</button>
+							<a href="<?php echo $this->add_to_querystring( array( 'action' => 'entries' ), TRUE ); ?>" class="btn btn-danger">
+								Cancel
+							</a>
+						</div>
+
+					</form>
+
+				</div>
+
+				<div class="col-md-4">
+
+					<?php
+
+					$thumb = wp_get_attachment_image( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_THUMB );
+					$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), 'full' );
+
+					?>
+
+					<span class="spokane-fair-image" data-image="<?php echo $full[0]; ?>"><?php echo $thumb; ?></span>
+
+				</div>
+
+			</div>
+
 		<?php } ?>
 
 	<?php } else { ?>

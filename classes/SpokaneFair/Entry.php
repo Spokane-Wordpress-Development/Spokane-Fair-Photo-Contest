@@ -68,7 +68,33 @@ class Entry {
 
 	public function read()
 	{
+		global $wpdb;
 
+		if ( $this->id !== NULL )
+		{
+			$sql = $wpdb->prepare( "
+			SELECT
+				e.*,
+				c.code AS category_code,
+				c.title AS category_title
+			FROM
+				" . $wpdb->prefix . self::TABLE_NAME . " e
+				LEFT JOIN " . $wpdb->prefix . Category::TABLE_NAME . " c
+					ON e.category_id = c.id
+			WHERE
+				e.id = %d",
+				$this->id
+			);
+
+			if ( $row = $wpdb->get_row( $sql ) )
+			{
+				$this->loadFromRow( $row );
+			}
+			else
+			{
+				$this->setId( NULL );
+			}
+		}
 	}
 
 	/**
@@ -84,16 +110,76 @@ class Entry {
 			->setTitle( $row->title )
 			->setCreatedAt( $row->created_at )
 			->setUpdatedAt( $row->updated_at );
+
+		if ( property_exists( $row, 'category_code' ) )
+		{
+			$category = new Category;
+			$category
+				->setId( $row->category_id )
+				->setCode( $row->category_code )
+				->setTitle( $row->category_title );
+
+			$this->setCategory( $category );
+		}
 	}
 
 	public function update()
 	{
+		global $wpdb;
 
+		if ( $this->id !== NULL )
+		{
+			$this->setUpdatedAt( time() );
+
+			$wpdb->update(
+				$wpdb->prefix . self::TABLE_NAME,
+				array(
+					'photographer_id' => $this->photographer_id,
+					'category_id' => $this->category_id,
+					'photo_post_id' => $this->photo_post_id,
+					'title' => $this->title,
+					'updated_at' => $this->getUpdatedAt( 'Y-m-d H:i:s' )
+				),
+				array(
+					'id' => $this->id
+				),
+				array(
+					'%d',
+					'%d',
+					'%d',
+					'%s',
+					'%s'
+				),
+				array(
+					'%d'
+				)
+			);
+		}
 	}
 
 	public function delete()
 	{
+		global $wpdb;
 
+		if ( $this->id !== NULL )
+		{
+			$wpdb->delete(
+				$wpdb->prefix . self::TABLE_NAME,
+				array(
+					'id' => $this->id
+				),
+				array(
+					'%d'
+				)
+			);
+
+			$this->setId( NULL );
+		}
+	}
+
+	public function getCode( $add_extension=FALSE )
+	{
+		return $this->getCategory()->getCode() . '_' . str_pad( $this->getId(), 4, '0', STR_PAD_LEFT ) . '_' . $this->getTitle( TRUE ) . ( ( $add_extension ) ? '.jpg' : '' );
 	}
 
 	/**
@@ -177,11 +263,28 @@ class Entry {
 	}
 
 	/**
-	 * @return mixed
+	 * @param bool $url_format
+	 *
+	 * @return string
 	 */
-	public function getTitle()
+	public function getTitle( $url_format=FALSE )
 	{
-		return ( $this->title === NULL ) ? '' : $this->title;
+		if ( $this->title === NULL )
+		{
+			return '';
+		}
+		else
+		{
+			$patterns = array();
+			$replacements = array();
+
+			$patterns[1] = '/[ ]/';
+			$patterns[0] = '/[^a-zA-Z0-9_\.]/';
+			$replacements[0] = '_';
+			$replacements[1] = '';
+
+			return ( $url_format ) ? strtolower( preg_replace( $patterns, $replacements, $this->title ) ) : $this->title;
+		}
 	}
 
 	/**
@@ -303,11 +406,15 @@ class Entry {
 
 		$sql = $wpdb->prepare("
 			SELECT
-				*
+				e.*,
+				c.code AS category_code,
+				c.title AS category_title
 			FROM
-				" . $wpdb->prefix . self::TABLE_NAME . "
+				" . $wpdb->prefix . self::TABLE_NAME . " e
+				LEFT JOIN " . $wpdb->prefix . Category::TABLE_NAME . " c
+					ON e.category_id = c.id
 			WHERE
-				photographer_id = %d",
+				e.photographer_id = %d",
 			$photographer_id
 		);
 
