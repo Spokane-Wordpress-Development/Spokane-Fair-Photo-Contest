@@ -348,7 +348,7 @@ class Controller {
 						{
 							$this->addError( 'Please enter a title' );
 						}
-						elseif ( ! empty( $_FILES['file']['tmp_name'] && strtolower( substr(  $_FILES['file']['name'], -4 ) ) != '.jpg' ) )
+						elseif ( ! empty( $_FILES['file']['tmp_name'] ) && strtolower( substr(  $_FILES['file']['name'], -4 ) ) != '.jpg' )
 						{
 							$this->addError( 'Please choose file ending in .jpg' );
 						}
