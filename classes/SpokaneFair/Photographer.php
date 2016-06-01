@@ -302,6 +302,11 @@ class Photographer {
 	 */
 	public function loadEntries()
 	{
+		if ( $this->id !== NULL )
+		{
+			$this->entries = Entry::getPhotographerEntries( $this->id );
+		}
+
 		return $this;
 	}
 

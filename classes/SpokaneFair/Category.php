@@ -262,10 +262,10 @@ class Category {
 					ON c.id = e.category_id
 			WHERE
 				c.is_visible = 1
-			ORDER BY
-				c.title
 			GROUP BY
-				c.id";
+				c.id
+			ORDER BY
+				c.title";
 
 		$rows = $wpdb->get_results( $sql );
 		foreach( $rows as $row )

@@ -8,6 +8,9 @@ class Controller {
 	const VERSION_JS = '1.0.0';
 	const VERSION_CSS = '1.0.0';
 
+	const IMG_THUMB = 'spokane-fair-thumb';
+	const IMG_FULL = 'spokane-fair-full';
+
 	private $errors;
 	
 	/** @var Photographer $photographer */
@@ -98,9 +101,10 @@ class Controller {
 					`id` INT(11) NOT NULL AUTO_INCREMENT,
 					`photographer_id` INT(11) DEFAULT NULL,
 					`category_id` INT(11) DEFAULT NULL,
-					`code` VARCHAR(50) DEFAULT NULL,
+					`photo_post_id` INT(11) DEFAULT NULL,
 					`title` VARCHAR(50) DEFAULT NULL,
 					`created_at` DATETIME DEFAULT NULL,
+					`updated_at` DATETIME DEFAULT NULL,
 					PRIMARY KEY (`id`),
 					KEY `photographer_id` (`photographer_id`),
 					KEY `category_id` (`category_id`)
@@ -131,10 +135,14 @@ class Controller {
 
 	public function init()
 	{
+		wp_enqueue_media();
 		add_thickbox();
 		wp_enqueue_style( 'spokane-fair-fa', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_JS, TRUE );
 		wp_enqueue_script( 'spokane-fair-js', plugin_dir_url( dirname( __DIR__ )  ) . 'js/spokane-fair.js', array( 'jquery' ), ( WP_DEBUG ) ? time() : self::VERSION_JS, TRUE );
 		wp_enqueue_style( 'spokane-fair-bootstrap-css', plugin_dir_url( dirname( __DIR__ ) ) . 'css/bootstrap.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_CSS );
+
+		add_image_size( self::IMG_THUMB , 200, 200 );
+		add_image_size( self::IMG_FULL , 1920, 1080 );
 
 		if ( $this->photographer === NULL )
 		{
@@ -242,6 +250,75 @@ class Controller {
 						}
 
 						break;
+
+					case 'submit':
+
+						$category_id = $_POST['category_id'];
+						$title = trim( $_POST['title'] );
+
+						if ( strlen( $title ) == 0 )
+						{
+							$this->addError( 'Please enter a title' );
+						}
+						elseif ( ! isset( $_FILES['file'] ) || empty( $_FILES['file']['tmp_name'] ) )
+						{
+							$this->addError( 'Please choose a file to upload' );
+						}
+						elseif ( strtolower( substr(  $_FILES['file']['name'], -4 ) ) != '.jpg' )
+						{
+							$this->addError( 'Please choose file ending in .jpg' );
+						}
+
+						if ( count( $this->errors ) == 0 )
+						{
+							$image = getimagesize( $_FILES['file']['tmp_name'] );
+							if ( $image[0] < 1920 || $image[1] < 1080 )
+							{
+								$this->addError( 'Photos must be at least 1920 X 1080 pixels. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+							}
+						}
+
+						if ( count( $this->errors ) == 0 )
+						{
+							$file = wp_upload_bits( $_FILES['file']['name'], NULL, @file_get_contents( $_FILES['file']['tmp_name'] ) );
+
+							if ( ! $file['error'] )
+							{
+								$wp_filetype = wp_check_filetype( $_FILES['file']['name'], NULL );
+								$attachment = array(
+									'post_mime_type' => $wp_filetype['type'],
+									'post_parent' => 0,
+									'post_title' => preg_replace( '/\.[^.]+$/', '', $_FILES['file']['name'] ),
+									'post_content' => '',
+									'post_status' => 'inherit'
+								);
+								$attachment_id = wp_insert_attachment( $attachment, $file['file'], 0 );
+								if ( ! is_wp_error( $attachment_id ) )
+								{
+									require_once( ABSPATH . 'wp-admin' . '/includes/image.php');
+									$attachment_data = wp_generate_attachment_metadata( $attachment_id, $file['file'] );
+									wp_update_attachment_metadata( $attachment_id,  $attachment_data );
+
+									$entry = new Entry;
+									$entry
+										->setPhotographerId( $this->getPhotographer()->getId() )
+										->setCategoryId( $category_id )
+										->setTitle( $title )
+										->setPhotoPostId( $attachment_id )
+										->create();
+
+									if ( $entry->getId() !== NULL )
+									{
+										header( 'Location:' . $this->add_to_querystring( array( 'action' => 'entries', 'new' => 'true' ), TRUE ) );
+										exit;
+									}
+								}
+							}
+
+							$this->addError( 'There was a problem uploading your photo. Please try again.' );
+						}
+
+						break;
 				}
 			}
 			else
@@ -337,7 +414,7 @@ class Controller {
 		$end_date = get_option( 'spokane_fair_end_date' , '' );
 		return ( strlen( $end_date ) == 0 ) ? '' : date( $format, strtotime( $end_date ) );
 	}
-	
+
 	public function getPayPalEmail()
 	{
 		$email = get_option( 'spokane_fair_paypal_email' , '' );

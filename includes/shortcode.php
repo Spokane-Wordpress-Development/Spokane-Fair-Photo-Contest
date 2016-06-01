@@ -194,6 +194,87 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 		
 	<?php } elseif ( $action == 'entries' ) { ?>
 
+	<?php } elseif ( $action == 'submit' ) { ?>
+
+		<?php $categories = \SpokaneFair\Category::getAllVisibleCategories(); ?>
+
+		<?php if ( $this->getPhotographer()->getEntriesLeftCount() == 0 ) { ?>
+
+			<div class="alert alert-danger">
+				<p>You do not have any more enties left.</p>
+				<p>
+					<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ), TRUE ); ?>">
+						<i class="fa fa-shopping-cart"></i>
+						Purchase More Entries
+					</a>
+				</p>
+			</div>
+
+		<?php } elseif ( count( $categories ) == 0 ) { ?>
+			
+			<div class="alert alert-danger">
+				Photo uploading is currently offline. Please check back later.
+			</div>
+			
+		<?php } else { ?>
+
+			<div class="alert alert-info">
+				<strong>Note:</strong>
+				Photos must be at least 1920 X 1080 pixels and must be a JPG format.
+			</div>
+			
+			<div class="row">
+				<div class="col-md-8">
+
+					<form method="post" enctype="multipart/form-data" id="sf_submit_entry_form">
+
+						<?php wp_nonce_field( 'spokane_fair_submit', 'spokane_fair_nonce' ); ?>
+						<input type="hidden" name="spokane_fair_action" value="submit">
+
+						<div class="form-group">
+							<label for="sf_category_id">
+								Choose a Category
+							</label>
+							<select class="form-control" name="category_id" id="sf_category_id">
+								<?php foreach ( $categories as $category ) { ?>
+									<option value="<?php echo $category->getId(); ?>"<?php if ( isset( $_POST['category_id'] ) && $_POST['category_id'] == $category->getId() ) { ?> selected<?php } ?>>
+										<?php echo $category->getTitle(); ?>
+									</option>
+								<?php } ?>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label for="sf_title">
+								Title of Photo
+							</label>
+							<input class="form-control" name="title" id="sf_title" value="<?php echo ( isset( $_POST['title'] ) ) ? esc_html( $_POST['title'] ) : ''; ?>">
+						</div>
+
+						<div class="form-group">
+							<label for="sf_file">
+								Upload Your Photo
+							</label>
+							<input type="file" name="file" id="sf_file" class="form-control">
+						</div>
+
+						<div class="well">
+							<button id="sf_submit_entry_add" class="btn btn-default">
+								Submit
+							</button>
+							<a href="<?php echo $this->add_to_querystring( array(), TRUE ); ?>" class="btn btn-danger">
+								Cancel
+							</a>
+						</div>
+
+					</form>
+
+				</div>
+				
+			</div>
+			
+		<?php } ?>
+
 	<?php } else { ?>
 	
 		<p>Welcome back<?php if ( strlen( $this->getPhotographer()->getFullName() ) > 0 ) { ?>, <?php echo $this->getPhotographer()->getFullName(); ?><?php } ?>!</p>
@@ -247,20 +328,22 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					</td>
 				</tr>
 			<?php } ?>
-			<tr>
-				<th>Entries Left</th>
-				<td>
-					<?php echo $this->getPhotographer()->getEntriesLeftCount(); ?>/<?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?>
-				</td>
-				<td>
-					<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
-						<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ) ); ?>">
-							<i class="fa fa-camera"></i>
-							Submit a Photo Entry
-						</a>
-					<?php } ?>
-				</td>
-			</tr>
+			<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
+				<tr>
+					<th>Entries Left</th>
+					<td>
+						<?php echo $this->getPhotographer()->getEntriesLeftCount(); ?>/<?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?>
+					</td>
+					<td>
+						<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
+							<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ) ); ?>">
+								<i class="fa fa-camera"></i>
+								Upload a Photo
+							</a>
+						<?php } ?>
+					</td>
+				</tr>
+			<?php } ?>
 		</table>
 
 	<?php } ?>
