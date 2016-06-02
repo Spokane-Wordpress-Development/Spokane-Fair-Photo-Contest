@@ -63,8 +63,16 @@ class CategoryTable extends \WP_List_Table {
 		switch( $column_name ) {
 			case 'code':
 			case 'title':
-			case 'entry_count':
 				return $item->$column_name;
+			case 'entry_count':
+				if ( $item->$column_name == 0 )
+				{
+					return '';
+				}
+				else
+				{
+					return '<a href="?page=spokane_fair_submissions&category_code='. $item->code .'">' . $item->$column_name . '</a>';
+				}
 			case 'is_visible':
 				return ( $item->is_visible == 1 ) ? 'Yes' : 'No';
 			case 'edit':
