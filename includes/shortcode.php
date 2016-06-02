@@ -173,7 +173,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 											<input type="hidden" name="cmd" value="_xclick">
 											<input type="hidden" name="business" value="<?php echo $this->getPayPalEmail(); ?>">
 											<input type="hidden" name="currency_code" value="USD">
-											<input type="hidden" name="item_name" value="P<?php echo $this->getPhotographer()->getId(); ?>O<?php echo $order->getId(); ?>">
+											<input type="hidden" name="item_name" value="<?php echo $order->getOrderNumber(); ?>">
 											<input type="hidden" name="amount" value="<?php echo $order->getAmount(); ?>">
 											<input type="hidden" name="return" value="<?php echo get_site_url() . $this->add_to_querystring( array( 'action' => 'ordered', 'paid' => $order->getId() ), TRUE ); ?>">
 											<input type="hidden" name="cancel_return" value="<?php echo get_site_url() . $this->add_to_querystring( array( 'action' => 'ordered' ), TRUE ); ?>">

@@ -30,9 +30,9 @@ class PhotographerTable extends \WP_List_Table {
 			'ID' => 'ID',
 			'name' => 'Name',
 			'state' => 'State',
-			'orders' => 'Orders',
-			'paid' => 'Paid',
-			'entries' => 'Entries',
+			'orders' => 'Entries Ordered',
+			'paid' => 'Entries Paid For',
+			'entries' => 'Submissions',
 			'view' => 'View'
 		);
 

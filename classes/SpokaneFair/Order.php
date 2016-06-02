@@ -227,6 +227,11 @@ class Order {
 		return $this;
 	}
 
+	public function getOrderNumber()
+	{
+		return 'P' . $this->getPhotographerId() . 'O' . $this->getId();
+	}
+
 	/**
 	 * @param int $photographer_id
 	 *
