@@ -152,12 +152,12 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 
 				<table class="table table-striped table-bordered">
 					<thead>
-					<tr>
-						<th>Date</th>
-						<th>Entries Purchased</th>
-						<th>Amount Due</th>
-						<th>Payment Info</th>
-					</tr>
+						<tr>
+							<th>Date</th>
+							<th>Entries Purchased</th>
+							<th>Amount Due</th>
+							<th>Payment Info</th>
+						</tr>
 					</thead>
 					<?php foreach ( $this->getPhotographer()->getOrders() as $order ) { ?>
 						<tr>
@@ -239,7 +239,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					<?php
 
 					$thumb = wp_get_attachment_image( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_THUMB );
-					$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), 'full' );
+					$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL );
 
 					?>
 					<tr>

@@ -19,6 +19,47 @@ class Photographer {
 	private $orders;
 
 	/**
+	 * Photographer constructor.
+	 *
+	 * @param null $id
+	 */
+	public function __construct( $id=NULL )
+	{
+		$this
+			->setId( $id )
+			->read();
+	}
+
+	public function read()
+	{
+		if ( $this->id !== NULL )
+		{
+			if ( $user = get_user_by( 'ID', $this->id ) )
+			{
+				$this
+					->setId( $user->ID )
+					->setUsername( $user->user_login )
+					->setFirstName( $user->user_firstname )
+					->setLastName( $user->user_lastname )
+					->setEmail( $user->user_email )
+					->setState( get_user_meta( $user->ID, 'state', TRUE ) )
+					->setPhone( get_user_meta( $user->ID, 'phone', TRUE ) )
+					->loadEntries()
+					->loadOrders();
+			}
+			else
+			{
+				$this->setId( NULL );
+			}
+		}
+	}
+
+	public function update()
+	{
+
+	}
+
+	/**
 	 * @return mixed
 	 */
 	public function getId()

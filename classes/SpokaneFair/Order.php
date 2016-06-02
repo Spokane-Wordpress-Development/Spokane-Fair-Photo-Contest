@@ -229,7 +229,7 @@ class Order {
 
 	public function getOrderNumber()
 	{
-		return 'P' . $this->getPhotographerId() . 'O' . $this->getId();
+		return str_pad( $this->getPhotographerId(), 4, '0', STR_PAD_LEFT ) . '_' . str_pad( $this->getId(), 4, '0', STR_PAD_LEFT );
 	}
 
 	/**
