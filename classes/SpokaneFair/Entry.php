@@ -121,6 +121,20 @@ class Entry {
 
 			$this->setCategory( $category );
 		}
+
+		if ( property_exists( $row, 'email' ) )
+		{
+			$photographer = new Photographer;
+			$photographer
+				->setId( $row->photographer_id )
+				->setFirstName( $row->first_name )
+				->setLastName( $row->last_name )
+				->setEmail( $row->email )
+				->setPhone( $row->phone )
+				->setState( $row->state );
+
+			$this->setPhotographer( $photographer );
+		}
 	}
 
 	public function update()
@@ -417,6 +431,84 @@ class Entry {
 				e.photographer_id = %d",
 			$photographer_id
 		);
+
+		$rows = $wpdb->get_results( $sql );
+		foreach( $rows as $row )
+		{
+			$entry = new Entry;
+			$entry->loadFromRow( $row );
+			$entries[ $entry->getId() ] = $entry;
+		}
+
+		return $entries;
+	}
+
+	/**
+	 * @return Entry[]
+	 */
+	public static function getAllEntries()
+	{
+		global $wpdb;
+		$entries = array();
+
+		$sql = "
+			SELECT
+				e.*,
+				c.code AS category_code,
+				c.title AS category_title,
+				u.user_email AS email,
+				fn.first_name,
+				ln.last_name,
+				s.state,
+				p.phone
+			FROM
+				" . $wpdb->prefix . self::TABLE_NAME . " e
+				JOIN " . $wpdb->prefix . Category::TABLE_NAME . " c
+					ON e.category_id = c.id
+				JOIN " . $wpdb->prefix . "users u
+					ON e.photographer_id = u.ID
+				LEFT JOIN
+				(
+					SELECT
+						user_id,
+						meta_value AS first_name
+					FROM
+						" . $wpdb->prefix . "usermeta
+					WHERE
+						meta_key = 'first_name'
+				) fn ON u.ID = fn.user_id
+				LEFT JOIN
+				(
+					SELECT
+						user_id,
+						meta_value AS last_name
+					FROM
+						" . $wpdb->prefix . "usermeta
+					WHERE
+						meta_key = 'last_name'
+				) ln ON u.ID = ln.user_id
+				LEFT JOIN
+				(
+					SELECT
+						user_id,
+						meta_value AS phone
+					FROM
+						" . $wpdb->prefix . "usermeta
+					WHERE
+						meta_key = 'phone'
+				) p ON u.ID = p.user_id
+				LEFT JOIN
+				(
+					SELECT
+						user_id,
+						meta_value AS state
+					FROM
+						" . $wpdb->prefix . "usermeta
+					WHERE
+						meta_key = 'state'
+				) s ON u.ID = s.user_id
+			ORDER BY
+				e.id DESC";
 
 		$rows = $wpdb->get_results( $sql );
 		foreach( $rows as $row )

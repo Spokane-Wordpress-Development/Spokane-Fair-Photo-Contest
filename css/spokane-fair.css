@@ -1,3 +1,7 @@
 .spokane-fair-image {
     cursor: pointer;
 }
+
+.select-mono {
+    font-family: "Courier New", Courier, monospace;
+}
