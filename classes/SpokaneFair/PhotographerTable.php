@@ -93,9 +93,9 @@ class PhotographerTable extends \WP_List_Table {
 				ln.last_name,
 				s.state,
 				p.phone,
-				COUNT(o.id) AS orders,
+				COUNT(DISTINCT o.id) AS orders,
 				SUM(IF(o.paid_at IS NOT NULL,1,0)) AS paid,
-				COUNT(e.id) AS entries
+				COUNT(DISTINCT e.id) AS entries
 			FROM
 				" . $wpdb->prefix . "users u
 				JOIN " . $wpdb->prefix . Order::TABLE_NAME . " o
