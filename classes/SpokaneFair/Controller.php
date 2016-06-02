@@ -206,7 +206,7 @@ class Controller {
 								'last_name' => $_POST['lname']
 							);
 							$user_id = wp_insert_user( $user_data );
-							update_user_meta( $user_id, 'state', $_SESSION['state'] );
+							update_user_meta( $user_id, 'state', $_POST['state'] );
 							update_user_meta( $user_id, 'phone', $_POST['phone'] );
 
 							header( 'Location:' . $this->add_to_querystring( array( 'action' => 'registered' ), TRUE ) );
