@@ -293,7 +293,7 @@ class Entry {
 			$replacements = array();
 
 			$patterns[1] = '/[ ]/';
-			$patterns[0] = '/[^a-zA-Z0-9_\.]/';
+			$patterns[0] = '/[^a-zA-Z0-9_]/';
 			$replacements[0] = '_';
 			$replacements[1] = '';
 
