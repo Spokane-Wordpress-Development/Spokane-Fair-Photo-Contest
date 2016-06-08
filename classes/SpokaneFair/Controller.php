@@ -9,7 +9,8 @@ class Controller {
 	const VERSION_CSS = '1.0.1';
 
 	const IMG_THUMB = 'spokane-fair-thumb';
-	const IMG_FULL = 'spokane-fair-full';
+	const IMG_FULL_LANDSCAPE = 'spokane-fair-full';
+	const IMG_FULL_PORTRAIT = 'spokane-fair-full-landscape';
 
 	private $errors;
 	
@@ -143,7 +144,8 @@ class Controller {
 		wp_enqueue_style( 'spokane-fair-css', plugin_dir_url( dirname( __DIR__ ) ) . 'css/spokane-fair.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_CSS );
 
 		add_image_size( self::IMG_THUMB , 200, 200 );
-		add_image_size( self::IMG_FULL , 1920, 1080 );
+		add_image_size( self::IMG_FULL_LANDSCAPE , 1920, 1080 );
+		add_image_size( self::IMG_FULL_PORTRAIT , 720, 1080 );
 
 		if ( $this->photographer === NULL )
 		{
@@ -282,9 +284,9 @@ class Controller {
 					if ( count( $this->errors ) == 0 )
 					{
 						$image = getimagesize( $_FILES['file']['tmp_name'] );
-						if ( $image[0] < 1920 || $image[1] < 1080 )
+						if ( $image[0] < 1920 && $image[1] < 1080 )
 						{
-							$this->addError( 'Photos must be at least 1920 X 1080 pixels. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+							$this->addError( 'Photos must be at least 1920 pixels wide or 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 						}
 					}
 
@@ -365,9 +367,9 @@ class Controller {
 						if ( count( $this->errors ) == 0 && ! empty( $_FILES['file']['tmp_name'] ) )
 						{
 							$image = getimagesize( $_FILES['file']['tmp_name'] );
-							if ( $image[0] < 1920 || $image[1] < 1080 )
+							if ( $image[0] < 1920 && $image[1] < 1080 )
 							{
-								$this->addError( 'Photos must be at least 1920 X 1080 pixels. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+								$this->addError( 'Photos must be at least 1920 pixels wide or 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 							}
 						}
 

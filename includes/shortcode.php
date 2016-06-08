@@ -244,7 +244,19 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					<?php
 
 					$thumb = wp_get_attachment_image( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_THUMB );
-					$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL );
+					$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), 'full' );
+
+					$width = $full[1];
+					$height = $full[2];
+
+					if ( $width >= $height )
+					{
+						$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL_LANDSCAPE );
+					}
+					else
+					{
+						$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL_PORTRAIT );
+					}
 
 					?>
 					<tr>
@@ -303,7 +315,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 
 			<div class="alert alert-info">
 				<strong>Note:</strong>
-				Photos must be at least 1920 X 1080 pixels and must be a JPG format.
+				Photos must be at least 1920 pixels wide or 1080 pixels tall and must be a JPG format.
 			</div>
 			
 			<div class="row">
@@ -384,7 +396,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 
 			<div class="alert alert-info">
 				<strong>Note:</strong>
-				Photos must be at least 1920 X 1080 pixels and must be a JPG format.
+				Photos must be at least 1920 pixels wide or 1080 pixels tall and must be a JPG format.
 			</div>
 
 			<div class="row">

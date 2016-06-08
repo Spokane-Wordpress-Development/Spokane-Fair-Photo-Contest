@@ -85,7 +85,20 @@ ksort( $categories );
 				}
 			}
 
-			$src = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL );
+			$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), 'full' );
+
+			$width = $full[1];
+			$height = $full[2];
+
+			if ( $width >= $height )
+			{
+				$src = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL_LANDSCAPE );
+			}
+			else
+			{
+				$src = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL_PORTRAIT );
+			}
+
 			$src = str_replace( $baseurl, $basedir, $src[0] );
 			$name = $entry->getCode( TRUE );
 			copy( $src, $folder . '/' . $name );
@@ -179,7 +192,19 @@ ksort( $categories );
 					<?php
 
 					$thumb = wp_get_attachment_image( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_THUMB );
-					$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL );
+					$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), 'full' );
+
+					$width = $full[1];
+					$height = $full[2];
+
+					if ( $width >= $height )
+					{
+						$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL_LANDSCAPE );
+					}
+					else
+					{
+						$full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL_PORTRAIT );
+					}
 
 					?>
 					<tr>
