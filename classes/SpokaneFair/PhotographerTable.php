@@ -95,13 +95,21 @@ class PhotographerTable extends \WP_List_Table {
 				p.phone,
 				SUM(o.entries) AS orders,
 				SUM(IF(o.paid_at IS NOT NULL,o.entries,0)) AS paid,
-				COUNT(DISTINCT e.id) AS entries
+				COALESCE(e.entries, 0) AS entries
 			FROM
 				" . $wpdb->prefix . "users u
 				JOIN " . $wpdb->prefix . Order::TABLE_NAME . " o
 					ON u.ID = o.photographer_id
-				LEFT JOIN " . $wpdb->prefix . Entry::TABLE_NAME . " e
-					ON u.ID = e.photographer_id
+				LEFT JOIN 
+				(
+					SELECT
+						photographer_id,
+						COUNT(id) AS entries
+					FROM
+						" . $wpdb->prefix . Entry::TABLE_NAME . "
+					GROUP BY
+						photographer_id
+				) e ON u.ID = e.photographer_id
 				LEFT JOIN
 				(
 					SELECT
@@ -164,7 +172,7 @@ class PhotographerTable extends \WP_List_Table {
 					fn.first_name ASC";
 		}
 
-		$total_items = $wpdb->query($sql);
+		$total_items = $wpdb->query( $sql );
 
 		$max_per_page = 50;
 		$paged = ( isset( $_GET[ 'paged' ] ) && is_numeric( $_GET['paged'] ) ) ? abs( round( $_GET[ 'paged' ])) : 1;
