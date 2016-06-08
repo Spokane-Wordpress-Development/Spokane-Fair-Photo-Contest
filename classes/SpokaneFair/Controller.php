@@ -224,6 +224,15 @@ class Controller {
 						}
 						else
 						{
+							if ( $this->getNumberFreeAt() > 0 )
+							{
+								$free_instances = floor( $entries / $this->getNumberFreeAt() );
+								if ( $free_instances > 0 )
+								{
+									$entries += ( $free_instances * $this->getFreeQty() );
+								}
+							}
+
 							$price = 0;
 							$y = 0;
 							for ( $x=1; $x<=$entries; $x++ )
