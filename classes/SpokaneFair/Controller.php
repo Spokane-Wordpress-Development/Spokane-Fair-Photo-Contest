@@ -70,7 +70,7 @@ class Controller {
 		$charset_collate = '';
 		if ( ! empty( $wpdb->charset ) )
 		{
-			$charset_collate .= "DEFAULT CHARACTER SET " . $wpdb->charset;
+			$charset_collate .= " DEFAULT CHARACTER SET " . $wpdb->charset;
 		}
 		if ( ! empty( $wpdb->collate ) )
 		{
@@ -95,25 +95,22 @@ class Controller {
 
 		/* entries table */
 		$table = $wpdb->prefix . Entry::TABLE_NAME;
-		if( $wpdb->get_var( "SHOW TABLES LIKE '" . $table . "'" ) != $table ) {
-			$sql = "
-				CREATE TABLE `" . $table . "`
-				(
-					`id` INT(11) NOT NULL AUTO_INCREMENT,
-					`photographer_id` INT(11) DEFAULT NULL,
-					`category_id` INT(11) DEFAULT NULL,
-					`photo_post_id` INT(11) DEFAULT NULL,
-					`title` VARCHAR(50) DEFAULT NULL,
-					`created_at` DATETIME DEFAULT NULL,
-					`updated_at` DATETIME DEFAULT NULL,
-					PRIMARY KEY (`id`),
-					KEY `photographer_id` (`photographer_id`),
-					KEY `category_id` (`category_id`)
+		$sql = "CREATE TABLE " . $table . " (
+					id INT(11) NOT NULL AUTO_INCREMENT,
+					random_code INT(11) DEFAULT NULL,
+					photographer_id INT(11) DEFAULT NULL,
+					category_id INT(11) DEFAULT NULL,
+					photo_post_id INT(11) DEFAULT NULL,
+					title VARCHAR(50) DEFAULT NULL,
+					created_at DATETIME DEFAULT NULL,
+					updated_at DATETIME DEFAULT NULL,
+					PRIMARY KEY  (id),
+					KEY photographer_id (photographer_id),
+					KEY category_id (category_id)
 				)";
-			$sql .= $charset_collate . ";"; // new line to avoid PHP Storm syntax error
-			dbDelta( $sql );
-		}
-		
+		$sql .= $charset_collate . ";"; // new line to avoid PHP Storm syntax error
+		dbDelta( $sql );
+
 		/* orders table */
 		$table = $wpdb->prefix . Order::TABLE_NAME;
 		if( $wpdb->get_var( "SHOW TABLES LIKE '" . $table . "'" ) != $table ) {

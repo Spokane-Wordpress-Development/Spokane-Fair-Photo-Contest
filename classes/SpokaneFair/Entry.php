@@ -7,6 +7,7 @@ class Entry {
 	const TABLE_NAME = 'spokane_fair_entries';
 
 	private $id;
+	private $random_code;
 	private $photographer_id;
 	private $category_id;
 	private $photo_post_id;
@@ -40,11 +41,13 @@ class Entry {
 		{
 			$this
 				->setCreatedAt( time() )
-				->setUpdatedAt( time() );
+				->setUpdatedAt( time() )
+				->assignRandomCode();
 
 			$wpdb->insert(
 				$wpdb->prefix . self::TABLE_NAME,
 				array(
+					'random_code' => $this->random_code,
 					'photographer_id' => $this->photographer_id,
 					'category_id' => $this->category_id,
 					'photo_post_id' => $this->photo_post_id,
@@ -53,6 +56,7 @@ class Entry {
 					'updated_at' => $this->getUpdatedAt( 'Y-m-d H:i:s' )
 				),
 				array(
+					'%d',
 					'%d',
 					'%d',
 					'%d',
@@ -104,12 +108,20 @@ class Entry {
 	{
 		$this
 			->setId( $row->id )
+			->setRandomCode( $row->random_code )
 			->setPhotographerId( $row->photographer_id )
 			->setCategoryId( $row->category_id )
 			->setPhotoPostId( $row->photo_post_id )
 			->setTitle( $row->title )
 			->setCreatedAt( $row->created_at )
 			->setUpdatedAt( $row->updated_at );
+
+		if ( $this->random_code === NULL )
+		{
+			$this
+				->assignRandomCode()
+				->update();
+		}
 
 		if ( property_exists( $row, 'category_code' ) )
 		{
@@ -148,6 +160,7 @@ class Entry {
 			$wpdb->update(
 				$wpdb->prefix . self::TABLE_NAME,
 				array(
+					'random_code' => $this->random_code,
 					'photographer_id' => $this->photographer_id,
 					'category_id' => $this->category_id,
 					'photo_post_id' => $this->photo_post_id,
@@ -158,6 +171,7 @@ class Entry {
 					'id' => $this->id
 				),
 				array(
+					'%d',
 					'%d',
 					'%d',
 					'%d',
@@ -193,7 +207,7 @@ class Entry {
 
 	public function getCode( $add_extension=FALSE )
 	{
-		return $this->getCategory()->getCode() . '_' . str_pad( $this->getId(), 4, '0', STR_PAD_LEFT ) . '_' . $this->getTitle( TRUE ) . ( ( $add_extension ) ? '.jpg' : '' );
+		return $this->getCategory()->getCode() . '_' . str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . $this->getTitle( TRUE ) . ( ( $add_extension ) ? '.jpg' : '' );
 	}
 
 	/**
@@ -212,6 +226,26 @@ class Entry {
 	public function setId( $id )
 	{
 		$this->id = ( is_numeric( $id ) ) ? intval( $id ) : NULL;
+
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getRandomCode()
+	{
+		return $this->random_code;
+	}
+
+	/**
+	 * @param mixed $random_code
+	 *
+	 * @return Entry
+	 */
+	public function setRandomCode( $random_code )
+	{
+		$this->random_code = ( is_numeric( $random_code ) ) ? intval( $random_code ) : NULL;
 
 		return $this;
 	}
@@ -519,5 +553,54 @@ class Entry {
 		}
 
 		return $entries;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getAllRandomCodes()
+	{
+		global $wpdb;
+		$codes = array();
+
+		$sql = "
+			SELECT
+				random_code
+			FROM
+				" . $wpdb->prefix . self::TABLE_NAME . "
+			WHERE
+				random_code IS NOT NULL";
+
+		$rows = $wpdb->get_results( $sql );
+		foreach( $rows as $row )
+		{
+			$codes[] = $row->random_code;
+		}
+
+		return $codes;
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function assignRandomCode()
+	{
+		$codes = self::getAllRandomCodes();
+		$code = NULL;
+		$min = 1;
+		$max = 9999;
+		if ( count( $codes ) > 9999 )
+		{
+			$max = 99999;
+		}
+
+		while ( $code === NULL || in_array( $code, $codes ) )
+		{
+			$code = rand( $min, $max );
+		}
+
+		$this->setRandomCode( $code );
+
+		return $this;
 	}
 }
