@@ -153,10 +153,15 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 				<table class="table table-striped table-bordered">
 					<thead>
 						<tr>
-							<th>Date</th>
-							<th>Entries Purchased</th>
-							<th>Amount Due</th>
-							<th>Payment Info</th>
+							<th>Date<br>&nbsp;</th>
+							<th>
+								Entries Purchased<br>
+								<em style="font-size:75%">
+									including any free entries
+								</em>
+							</th>
+							<th>Amount Due<br>&nbsp;</th>
+							<th>Payment Info<br>&nbsp;</th>
 						</tr>
 					</thead>
 					<?php foreach ( $this->getPhotographer()->getOrders() as $order ) { ?>
@@ -458,7 +463,12 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 
 		<table class="table table-bordered table-striped">
 			<tr>
-				<th>Entries Purchased</th>
+				<th>
+					Entries Purchased<br>
+					<em style="font-size:75%">
+						including any free entries
+					</em>
+				</th>
 				<td><?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?></td>
 				<td>
 					<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ) ); ?>">
