@@ -19,6 +19,7 @@
             } else if (parts[parts.length-1].toUpperCase() !== 'JPG') {
                 alert('Please choose file ending in .jpg')
             } else {
+                $('#sf_submit_well').html('<strong>Please wait while your image is uploaded (may take a few moments) ...</strong>')
                 $('#sf_submit_entry_form').submit();
             }
         });

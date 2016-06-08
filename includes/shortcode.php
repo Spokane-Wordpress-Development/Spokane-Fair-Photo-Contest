@@ -336,7 +336,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 							<input type="file" name="file" id="sf_file" class="form-control">
 						</div>
 
-						<div class="well">
+						<div class="well" id="sf_submit_well">
 							<button id="sf_submit_entry_add" class="btn btn-default">
 								Submit
 							</button>
