@@ -5,3 +5,23 @@
 .select-mono {
     font-family: "Courier New", Courier, monospace;
 }
+
+#spokane-fair-photos-shortcode {
+    text-align: left !important;
+}
+
+#spokane-fair-photos-shortcode button {
+    padding: 5px 10px !important;
+    border-radius: 5px !important;
+}
+
+#spokane-fair-photos-shortcode,
+#spokane-fair-photos-shortcode th,
+#spokane-fair-photos-shortcode td,
+.alert {
+    color: #000 !important;
+}
+
+.alert ul {
+    padding-left: 20px;
+}
