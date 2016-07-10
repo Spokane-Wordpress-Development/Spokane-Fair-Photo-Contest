@@ -99,6 +99,20 @@
             }
         });
 
+        $('#delete-all-fair-entries').find('button').click(function(e){
+            e.preventDefault();
+            var what = $(this).data('what');
+            var which = $(this).data('which');
+            var nonce = $(this).data('nonce');
+            var b = confirm('Are you sure you want to delete all ' + what + '?');
+            if (b) {
+                var B = confirm('Are you really sure? This is your last chance to change your mind.');
+                if (B) {
+                    window.location = 'admin.php?page=spokane_fair_photos&spokane_fair_photos_delete=' + which + '&nonce=' + nonce;
+                }
+            }
+        });
+
     });
 
 })(jQuery);

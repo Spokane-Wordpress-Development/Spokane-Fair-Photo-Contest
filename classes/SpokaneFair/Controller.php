@@ -647,4 +647,23 @@ class Controller {
 
 		return TRUE;
 	}
+
+	public function create_nonce()
+	{
+		$nonce = uniqid();
+		update_option( 'spokane_fair_nonce', $nonce );
+		return $nonce;
+	}
+
+	public function validate_nonce( $nonce )
+	{
+		$option = get_option( 'spokane_fair_nonce', uniqid() );
+		if ( $option == $nonce )
+		{
+			$this->create_nonce();
+			return TRUE;
+		}
+
+		return FALSE;
+	}
 }

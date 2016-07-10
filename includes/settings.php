@@ -2,6 +2,41 @@
 
 /** @var \SpokaneFair\Controller $this */
 
+$message = NULL;
+
+if ( isset( $_GET['spokane_fair_photos_delete'] ) && isset( $_GET['nonce'] ) )
+{
+	$order_count = 0;
+	$entry_count = 0;
+
+	if ( $this->validate_nonce( $_GET['nonce'] ) )
+	{
+		if ( $_GET['spokane_fair_photos_delete'] == 'payments' || $_GET['spokane_fair_photos_delete'] == 'both' )
+		{
+			$orders = \SpokaneFair\Order::getAllOrders();
+			$order_count = count( $orders );
+
+			foreach ( $orders as $order )
+			{
+				$order->delete();
+			}
+		}
+
+		if ( $_GET['spokane_fair_photos_delete'] == 'submissions' || $_GET['spokane_fair_photos_delete'] == 'both' )
+		{
+			$entries = \SpokaneFair\Entry::getAllEntries();
+			$entry_count = count( $entries );
+
+			foreach ( $entries as $entry )
+			{
+				$entry->delete();
+			}
+		}
+
+		$message = 'Submissions Deleted: ' . $entry_count . '<br>Payments Deleted: ' . $order_count;
+	}
+}
+
 ?>
 
 <div class="wrap">
@@ -9,6 +44,12 @@
 	<h1>
 		Spokane Interstate Fair Photo Submission Settings
 	</h1>
+
+	<?php if ( $message !== NULL ) { ?>
+		<div class="alert alert-info">
+			<?php echo $message; ?>
+		</div>
+	<?php } ?>
 
 	<form method="post" action="options.php" autocomplete="off">
 
@@ -117,5 +158,20 @@
 	</p>
 
 	[spokane_fair_photos]
+
+	<h1>Delete All Submissions and/or Payments</h1>
+	<p>Use the buttons below with extreme caution.</p>
+	<?php $nonce = $this->create_nonce(); ?>
+	<form method="post" id="delete-all-fair-entries">
+		<button class="button button-primary" data-what="submissions" data-which="submissions" data-nonce="<?php echo $nonce; ?>">
+			Delete All Submissions
+		</button>
+		<button class="button button-primary" data-what="payments" data-which="payments" data-nonce="<?php echo $nonce; ?>">
+			Delete All Payments
+		</button>
+		<button class="button button-primary" data-what="submissions and payments" data-which="both" data-nonce="<?php echo $nonce; ?>">
+			Delete All Submissions and Payments
+		</button>
+	</form>
 
 </div>

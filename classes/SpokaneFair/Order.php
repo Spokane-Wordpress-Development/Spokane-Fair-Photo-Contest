@@ -90,7 +90,22 @@ class Order {
 
 	public function delete()
 	{
+		global $wpdb;
 
+		if ( $this->id !== NULL )
+		{
+			$wpdb->delete(
+				$wpdb->prefix . self::TABLE_NAME,
+				array(
+					'id' => $this->id
+				),
+				array(
+					'%d'
+				)
+			);
+
+			$this->setId( NULL );
+		}
 	}
 
 	/**
@@ -252,6 +267,31 @@ class Order {
 				photographer_id = %d",
 			$photographer_id
 		);
+
+		$rows = $wpdb->get_results( $sql );
+		foreach( $rows as $row )
+		{
+			$order = new Order;
+			$order->loadFromRow( $row );
+			$orders[ $order->getId() ] = $order;
+		}
+
+		return $orders;
+	}
+
+	/**
+	 * @return Order[]
+	 */
+	public static function getAllOrders()
+	{
+		global $wpdb;
+		$orders = array();
+
+		$sql = "
+			SELECT
+				*
+			FROM
+				" . $wpdb->prefix . self::TABLE_NAME;
 
 		$rows = $wpdb->get_results( $sql );
 		foreach( $rows as $row )
