@@ -5,8 +5,8 @@ namespace SpokaneFair;
 class Controller {
 	
 	const VERSION = '1.0.0';
-	const VERSION_JS = '1.0.1';
-	const VERSION_CSS = '1.0.2';
+	const VERSION_JS = '1.0.2';
+	const VERSION_CSS = '1.0.3';
 
 	const IMG_THUMB = 'spokane-fair-thumb';
 	const IMG_FULL_LANDSCAPE = 'spokane-fair-full';

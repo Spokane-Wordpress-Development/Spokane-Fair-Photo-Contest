@@ -8,6 +8,7 @@
 
 #spokane-fair-photos-shortcode {
     text-align: left !important;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 #spokane-fair-photos-shortcode button {
@@ -20,6 +21,7 @@
 #spokane-fair-photos-shortcode td,
 .alert {
     color: #000 !important;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 .alert ul {
