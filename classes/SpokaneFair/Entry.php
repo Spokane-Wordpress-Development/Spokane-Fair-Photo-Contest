@@ -478,12 +478,19 @@ class Entry {
 	}
 
 	/**
+	 * @param string $sort
+	 * @param string $dir
+	 *
 	 * @return Entry[]
 	 */
-	public static function getAllEntries()
+	public static function getAllEntries( $sort='e.id', $dir='DESC' )
 	{
 		global $wpdb;
 		$entries = array();
+
+		$sorts = array( 'e.id', 'e.title', 'c.title', 'e.created_at', 'ln.last_name' );
+		$sort = ( in_array( $sort, $sorts ) ) ? $sort : 'e.id';
+		$dir = ( $dir == 'ASC' ) ? 'ASC' : 'DESC';
 
 		$sql = "
 			SELECT
@@ -542,7 +549,7 @@ class Entry {
 						meta_key = 'state'
 				) s ON u.ID = s.user_id
 			ORDER BY
-				e.id DESC";
+				" . $sort . " " . $dir;
 
 		$rows = $wpdb->get_results( $sql );
 		foreach( $rows as $row )

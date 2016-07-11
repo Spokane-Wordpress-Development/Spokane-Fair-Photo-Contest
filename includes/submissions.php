@@ -4,7 +4,10 @@
 
 $category_code = ( isset( $_GET['category_code'] ) && strlen( $_GET['category_code'] ) > 0 ) ? $_GET['category_code'] : NULL;
 
-$entries = \SpokaneFair\Entry::getAllEntries();
+$sort = isset( $_GET['sort'] ) ? $_GET['sort'] : 'e.id';
+$dir = isset( $_GET['dir'] ) ? $_GET['dir'] : 'DESC';
+
+$entries = \SpokaneFair\Entry::getAllEntries( $sort, $dir );
 
 /** @var \SpokaneFair\Category[] $categories */
 $categories = array();
@@ -180,11 +183,13 @@ ksort( $categories );
 		<table class="table table-bordered table-striped">
 			<thead>
 				<tr>
+					<td><a href="admin.php?page=spokane_fair_submissions&sort=e.id&dir=<?php echo ( $sort == 'e.id' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">ID</a></td>
 					<td>Photo</td>
 					<td>Code</td>
-					<td>Title</td>
-					<td>Category</td>
-					<td>Photographer</td>
+					<td><a href="admin.php?page=spokane_fair_submissions&sort=e.title&dir=<?php echo ( $sort == 'e.title' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Title</a></td>
+					<td><a href="admin.php?page=spokane_fair_submissions&sort=c.title&dir=<?php echo ( $sort == 'c.title' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Category</a></td>
+					<td><a href="admin.php?page=spokane_fair_submissions&sort=e.created_at&dir=<?php echo ( $sort == 'e.created_at' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Date</a></td>
+					<td><a href="admin.php?page=spokane_fair_submissions&sort=ln.last_name&dir=<?php echo ( $sort == 'ln.last_name' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Photographer</a></td>
 				</tr>
 			</thead>
 			<?php foreach ( $entries as $entry ) { ?>
@@ -208,12 +213,14 @@ ksort( $categories );
 
 					?>
 					<tr>
+						<td><?php echo $entry->getId(); ?></td>
 						<td>
 							<span class="spokane-fair-image" data-image="<?php echo $full[0]; ?>"><?php echo $thumb; ?></span>
 						</td>
 						<td><?php echo $entry->getCode(); ?></td>
 						<td><?php echo $entry->getTitle(); ?></td>
 						<td><?php echo $entry->getCategory()->getTitle(); ?></td>
+						<td><?php echo $entry->getCreatedAt( 'n/j/Y g:i a' ); ?></td>
 						<td>
 							<a href="admin.php?page=spokane_fair_photographers&action=view&id=<?php echo $entry->getPhotographerId(); ?>">
 								<?php echo $entry->getPhotographer()->getFullName(); ?>

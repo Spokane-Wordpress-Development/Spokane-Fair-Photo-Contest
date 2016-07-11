@@ -29,6 +29,7 @@
 }
 
 #spokane-fair-photos-shortcode input[type="text"],
+#spokane-fair-photos-shortcode input[type="password"],
 #spokane-fair-photos-shortcode select
 {
     height: 34px !important;
