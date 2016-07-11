@@ -27,3 +27,10 @@
 .alert ul {
     padding-left: 20px;
 }
+
+#spokane-fair-photos-shortcode input[type="text"],
+#spokane-fair-photos-shortcode select
+{
+    height: 34px !important;
+    width: 100% !important;
+}

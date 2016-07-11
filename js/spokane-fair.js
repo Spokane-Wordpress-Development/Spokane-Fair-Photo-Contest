@@ -1,45 +1,55 @@
+var ok_to_submit = FALSE;
+
 (function($){
 
     $(function(){
 
         $('#sf_submit_entry_add').click(function(e){
 
-            e.preventDefault();
+            if (!ok_to_submit) {
 
-            var title = $('#sf_title').val();
-            var file = $('#sf_file').val();
-            var parts = file.split('.');
+                e.preventDefault();
 
-            if (title.length == 0){
-                alert('Please enter a title');
-            } else if (file.length == 0){
-                alert('Please choose a file to upload');
-            } else if (parts.length == 1){
-                alert('Please choose file ending in .jpg')
-            } else if (parts[parts.length-1].toUpperCase() !== 'JPG') {
-                alert('Please choose file ending in .jpg')
-            } else {
-                $('#sf_submit_well').html('<strong>Please wait while your image is uploaded (may take a few moments) ...</strong>')
-                $('#sf_submit_entry_form').submit();
+                var title = $('#sf_title').val();
+                var file = $('#sf_file').val();
+                var parts = file.split('.');
+
+                if (title.length == 0) {
+                    alert('Please enter a title');
+                } else if (file.length == 0) {
+                    alert('Please choose a file to upload');
+                } else if (parts.length == 1) {
+                    alert('Please choose file ending in .jpg')
+                } else if (parts[parts.length - 1].toUpperCase() !== 'JPG') {
+                    alert('Please choose file ending in .jpg')
+                } else {
+                    ok_to_submit = TRUE;
+                    $('#sf_submit_well').html('<strong>Please wait while your image is uploaded (may take a few moments) ...</strong>');
+                    $(this).trigger('click');
+                }
             }
         });
 
         $('#sf_submit_entry_edit').click(function(e){
 
-            e.preventDefault();
+            if (!ok_to_submit) {
 
-            var title = $('#sf_title').val();
-            var file = $('#sf_file').val();
-            var parts = file.split('.');
+                e.preventDefault();
 
-            if (title.length == 0){
-                alert('Please enter a title');
-            } else if (file.length > 0 && parts.length == 1){
-                alert('Please choose file ending in .jpg')
-            } else if (file.length > 0 && parts[parts.length-1].toUpperCase() !== 'JPG') {
-                alert('Please choose file ending in .jpg')
-            } else {
-                $('#sf_submit_entry_form').submit();
+                var title = $('#sf_title').val();
+                var file = $('#sf_file').val();
+                var parts = file.split('.');
+
+                if (title.length == 0){
+                    alert('Please enter a title');
+                } else if (file.length > 0 && parts.length == 1){
+                    alert('Please choose file ending in .jpg')
+                } else if (file.length > 0 && parts[parts.length-1].toUpperCase() !== 'JPG') {
+                    alert('Please choose file ending in .jpg')
+                } else {
+                    ok_to_submit = TRUE;
+                    $(this).trigger('click');
+                }
             }
         });
 
