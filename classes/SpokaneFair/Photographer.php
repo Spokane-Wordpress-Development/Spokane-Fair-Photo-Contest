@@ -339,6 +339,36 @@ class Photographer {
 	}
 
 	/**
+	 * @return int|mixed
+	 */
+	public function getPurchasedEntries()
+	{
+		$count = 0;
+
+		foreach ( $this->getOrders() as $order )
+		{
+			$count += $order->getPurchasedEntries();
+		}
+
+		return $count;
+	}
+
+	/**
+	 * @return int|mixed
+	 */
+	public function getFreeEntries()
+	{
+		$count = 0;
+
+		foreach ( $this->getOrders() as $order )
+		{
+			$count += $order->getFreeEntries();
+		}
+
+		return $count;
+	}
+
+	/**
 	 * @return $this
 	 */
 	public function loadEntries()

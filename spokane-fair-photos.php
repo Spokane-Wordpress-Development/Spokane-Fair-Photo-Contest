@@ -6,7 +6,7 @@
  * Description: A custom plugin for the Spokane Interstate Fair Photo Contest
  * Author: Spokane WordPress Development
  * Author URI: http://www.spokanewp.com
- * Version: 1.0.0
+ * Version: 1.1.0
  * Text Domain: spokane-fair
  *
  * Copyright 2016 Spokane WordPress Development

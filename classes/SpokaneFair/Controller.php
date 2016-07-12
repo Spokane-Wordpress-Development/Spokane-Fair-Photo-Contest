@@ -4,9 +4,9 @@ namespace SpokaneFair;
 
 class Controller {
 	
-	const VERSION = '1.0.0';
-	const VERSION_JS = '1.0.4';
-	const VERSION_CSS = '1.0.5';
+	const VERSION = '1.1.0';
+	const VERSION_JS = '1.1.0';
+	const VERSION_CSS = '1.1.0';
 
 	const IMG_THUMB = 'spokane-fair-thumb';
 	const IMG_FULL_LANDSCAPE = 'spokane-fair-full';
@@ -113,22 +113,20 @@ class Controller {
 
 		/* orders table */
 		$table = $wpdb->prefix . Order::TABLE_NAME;
-		if( $wpdb->get_var( "SHOW TABLES LIKE '" . $table . "'" ) != $table ) {
-			$sql = "
-				CREATE TABLE `" . $table . "`
-				(
-					`id` INT(11) NOT NULL AUTO_INCREMENT,
-					`photographer_id` INT(11) DEFAULT NULL,
-					`amount` DECIMAL(11,2) DEFAULT NULL,
-					`entries` INT(11) DEFAULT NULL,
-					`created_at` DATETIME DEFAULT NULL,
-					`paid_at` DATETIME DEFAULT NULL,
-					PRIMARY KEY (`id`),
-					KEY `photographer_id` (`photographer_id`)
+		$sql = "CREATE TABLE " . $table . " (
+					id INT(11) NOT NULL AUTO_INCREMENT,
+					photographer_id INT(11) DEFAULT NULL,
+					amount DECIMAL(11,2) DEFAULT NULL,
+					entries INT(11) DEFAULT NULL,
+					purchased_entries INT(11) DEFAULT NULL,
+					free_entries INT(11) DEFAULT NULL,
+					created_at DATETIME DEFAULT NULL,
+					paid_at DATETIME DEFAULT NULL,
+					PRIMARY KEY  (id),
+					KEY photographer_id (photographer_id)
 				)";
-			$sql .= $charset_collate . ";"; // new line to avoid PHP Storm syntax error
-			dbDelta( $sql );
-		}
+		$sql .= $charset_collate . ";"; // new line to avoid PHP Storm syntax error
+		dbDelta( $sql );
 	}
 
 	public function init()
@@ -213,7 +211,7 @@ class Controller {
 						}
 
 						break;
-
+					
 					case 'purchase':
 
 						$entries = ( isset( $_POST['entries'] ) && is_numeric( $_POST['entries'] ) ) ? intval( $_POST['entries'] ) : 0;
@@ -221,113 +219,117 @@ class Controller {
 						{
 							$this->addError( 'Please enter a valid number of entries' );
 						}
-						else
+
+						break;
+
+					case 'confirm':
+
+						if ( ! isset( $_POST['make_changes'] ) )
 						{
-							if ( $this->getNumberFreeAt() > 0 )
+							$new_entries = ( isset( $_POST['entries'] ) && is_numeric( $_POST['entries'] ) ) ? intval( $_POST['entries'] ) : 0;
+
+							if ( $new_entries == 0 )
 							{
-								$free_instances = floor( $entries / $this->getNumberFreeAt() );
-								if ( $free_instances > 0 )
-								{
-									$entries += ( $free_instances * $this->getFreeQty() );
-								}
+								$this->addError( 'Please enter a valid number of entries' );
 							}
-
-							$price = 0;
-							$y = 0;
-							for ( $x=1; $x<=$entries; $x++ )
+							else
 							{
-								$y++;
-								$price += $this->getPricePerEntry();
+								$previous_entries = $this->getPhotographer()->getPurchasedEntries();
+								$total_entries = $new_entries + $previous_entries;
 
-								if ( $y % $this->getNumberFreeAt() == 0 )
-								{
-									$y=0;
-									$x += $this->getFreeQty();
-								}
+								$total_free = Entry::getFreeEntryCount( $total_entries, $this->getNumberFreeAt(), $this->getFreeQty() );
+								$previous_free = $this->getPhotographer()->getFreeEntries();
+								$new_free = $total_free - $previous_free;
+
+								$entries = $new_entries + $new_free;
+
+								$price = $new_entries * $this->getPricePerEntry();
+
+								$order = new Order;
+								$order
+									->setPhotographerId( $this->getPhotographer()->getId() )
+									->setAmount( $price )
+									->setEntries( $entries )
+									->setPurchasedEntries( $new_entries )
+									->setFreeEntries( $new_free )
+									->setPaidAt( ( $price == 0 ) ? time() : NULL )
+									->create();
+
+								header( 'Location:' . $this->add_to_querystring( array( 'action' => 'ordered' ), TRUE ) );
+								exit;
 							}
-
-							$order = new Order;
-							$order
-								->setPhotographerId( $this->getPhotographer()->getId() )
-								->setAmount( $price )
-								->setEntries( $entries )
-								->setPaidAt( ( $price == 0 ) ? time() : NULL )
-								->create();
-
-							header( 'Location:' . $this->add_to_querystring( array( 'action' => 'ordered' ), TRUE ) );
-							exit;
 						}
 
 						break;
 
 					case 'submit':
 
-					$category_id = $_POST['category_id'];
-					$title = trim( $_POST['title'] );
+						$category_id = $_POST['category_id'];
+						$title = trim( $_POST['title'] );
 
-					if ( strlen( $title ) == 0 )
-					{
-						$this->addError( 'Please enter a title' );
-					}
-					elseif ( ! isset( $_FILES['file'] ) || empty( $_FILES['file']['tmp_name'] ) )
-					{
-						$this->addError( 'Please choose a file to upload' );
-					}
-					elseif ( strtolower( substr(  $_FILES['file']['name'], -4 ) ) != '.jpg' )
-					{
-						$this->addError( 'Please choose file ending in .jpg' );
-					}
-
-					if ( count( $this->errors ) == 0 )
-					{
-						$image = getimagesize( $_FILES['file']['tmp_name'] );
-						if ( $image[0] < 1920 && $image[1] < 1080 )
+						if ( strlen( $title ) == 0 )
 						{
-							$this->addError( 'Photos must be at least 1920 pixels wide or 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+							$this->addError( 'Please enter a title' );
 						}
-					}
-
-					if ( count( $this->errors ) == 0 )
-					{
-						$file = wp_upload_bits( $_FILES['file']['name'], NULL, @file_get_contents( $_FILES['file']['tmp_name'] ) );
-
-						if ( ! $file['error'] )
+						elseif ( ! isset( $_FILES['file'] ) || empty( $_FILES['file']['tmp_name'] ) )
 						{
-							$wp_filetype = wp_check_filetype( $_FILES['file']['name'], NULL );
-							$attachment = array(
-								'post_mime_type' => $wp_filetype['type'],
-								'post_parent' => 0,
-								'post_title' => preg_replace( '/\.[^.]+$/', '', $_FILES['file']['name'] ),
-								'post_content' => '',
-								'post_status' => 'inherit'
-							);
-							$attachment_id = wp_insert_attachment( $attachment, $file['file'], 0 );
-							if ( ! is_wp_error( $attachment_id ) )
+							$this->addError( 'Please choose a file to upload' );
+						}
+						elseif ( strtolower( substr(  $_FILES['file']['name'], -4 ) ) != '.jpg' )
+						{
+							$this->addError( 'Please choose file ending in .jpg' );
+						}
+
+						if ( count( $this->errors ) == 0 )
+						{
+							$image = getimagesize( $_FILES['file']['tmp_name'] );
+							if ( $image[0] < 1920 && $image[1] < 1080 )
 							{
-								require_once( ABSPATH . 'wp-admin' . '/includes/image.php');
-								$attachment_data = wp_generate_attachment_metadata( $attachment_id, $file['file'] );
-								wp_update_attachment_metadata( $attachment_id,  $attachment_data );
-
-								$entry = new Entry;
-								$entry
-									->setPhotographerId( $this->getPhotographer()->getId() )
-									->setCategoryId( $category_id )
-									->setTitle( $title )
-									->setPhotoPostId( $attachment_id )
-									->create();
-
-								if ( $entry->getId() !== NULL )
-								{
-									header( 'Location:' . $this->add_to_querystring( array( 'action' => 'entries', 'new' => 'true' ), TRUE ) );
-									exit;
-								}
+								$this->addError( 'Photos must be at least 1920 pixels wide or 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 							}
 						}
 
-						$this->addError( 'There was a problem uploading your photo. Please try again.' );
-					}
+						if ( count( $this->errors ) == 0 )
+						{
+							$file = wp_upload_bits( $_FILES['file']['name'], NULL, @file_get_contents( $_FILES['file']['tmp_name'] ) );
 
-					break;
+							if ( ! $file['error'] )
+							{
+								$wp_filetype = wp_check_filetype( $_FILES['file']['name'], NULL );
+								$attachment = array(
+									'post_mime_type' => $wp_filetype['type'],
+									'post_parent' => 0,
+									'post_title' => preg_replace( '/\.[^.]+$/', '', $_FILES['file']['name'] ),
+									'post_content' => '',
+									'post_status' => 'inherit'
+								);
+								$attachment_id = wp_insert_attachment( $attachment, $file['file'], 0 );
+								if ( ! is_wp_error( $attachment_id ) )
+								{
+									require_once( ABSPATH . 'wp-admin' . '/includes/image.php');
+									$attachment_data = wp_generate_attachment_metadata( $attachment_id, $file['file'] );
+									wp_update_attachment_metadata( $attachment_id,  $attachment_data );
+
+									$entry = new Entry;
+									$entry
+										->setPhotographerId( $this->getPhotographer()->getId() )
+										->setCategoryId( $category_id )
+										->setTitle( $title )
+										->setPhotoPostId( $attachment_id )
+										->create();
+
+									if ( $entry->getId() !== NULL )
+									{
+										header( 'Location:' . $this->add_to_querystring( array( 'action' => 'entries', 'new' => 'true' ), TRUE ) );
+										exit;
+									}
+								}
+							}
+
+							$this->addError( 'There was a problem uploading your photo. Please try again.' );
+						}
+
+						break;
 
 				case 'edit':
 

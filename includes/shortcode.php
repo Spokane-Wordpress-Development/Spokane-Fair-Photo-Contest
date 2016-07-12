@@ -42,36 +42,110 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 
 			<?php if ( $this->canSubmitEntry() ) { ?>
 
-				<?php if ( $this->getPricePerEntry() == 0 ) { ?>
+				<?php if ( count( $this->getErrors() ) == 0 && isset( $_POST['spokane_fair_action'] ) && $_POST['spokane_fair_action'] == 'purchase' ) { ?>
 
-					<p>There is currently no cost to submitting new entries.</p>
+					<?php
 
-				<?php } else { ?>
+					$previous_entries = $this->getPhotographer()->getPurchasedEntries();
+					$new_entries = ( isset( $_POST['entries'] ) && is_numeric( $_POST['entries'] ) ) ? intval( $_POST['entries'] ) : 0;
+					$total_entries = $new_entries + $previous_entries;
 
-					<p>
-						Entries cost $<?php echo number_format( $this->getPricePerEntry(), 2 ); ?> each.
-						<?php if ( $this->getNumberFreeAt() > 0 && $this->getFreeQty() > 0 ) { ?>
-							If you purchase <?php echo $this->getNumberFreeAt(); ?> entries, you will get
-							<?php echo $this->getFreeQty(); ?> additional free entr<?php if ( $this->getFreeQty() > 1 ) { ?>ies<?php } else { ?>y<?php } ?>.
+					$total_free = \SpokaneFair\Entry::getFreeEntryCount( $total_entries, $this->getNumberFreeAt(), $this->getFreeQty() );
+					$previous_free = $this->getPhotographer()->getFreeEntries();
+					$new_free = $total_free - $previous_free;
+
+					?>
+
+					<p>Please review your order below:</p>
+
+					<table class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th>Item</th>
+								<th>Qty</th>
+								<th>Price</th>
+							</tr>
+						</thead>
+						<?php if ( $this->getPhotographer()->getEntriesOrderedCount() > 0 ) { ?>
+							<tr>
+								<th>Previous Entries</th>
+								<td><?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?></td>
+								<td>-</td>
+							</tr>
 						<?php } ?>
-					</p>
+						<tr>
+							<th>New Entries</th>
+							<td><?php echo $new_entries; ?></td>
+							<td>$<?php echo number_format( \SpokaneFair\Entry::getPrice( $new_entries, $this->getPricePerEntry(), $this->getNumberFreeAt(), $this->getFreeQty() ), 2 ); ?></td>
+						</tr>
+						<?php if ( $new_free > 0 ) { ?>
+							<tr>
+								<th>Free Entries</th>
+								<td><?php echo $new_free; ?></td>
+								<td>FREE!</td>
+							</tr>
+						<?php } ?>
+						<tr>
+							<td colspan="3">&nbsp;</td>
+						</tr>
+						<tr>
+							<th>Grand Total</th>
+							<th><?php echo number_format( $new_entries + $new_free ); ?></th>
+							<td>$<?php echo number_format( \SpokaneFair\Entry::getPrice( $new_entries, $this->getPricePerEntry(), $this->getNumberFreeAt(), $this->getFreeQty() ), 2 ); ?></td>
+						</tr>
+					</table>
 
 					<form method="post">
 
-						<?php wp_nonce_field( 'spokane_fair_purchase', 'spokane_fair_nonce' ); ?>
-						<input type="hidden" name="spokane_fair_action" value="purchase">
+						<?php wp_nonce_field( 'spokane_fair_confirm', 'spokane_fair_nonce' ); ?>
+						<input type="hidden" name="spokane_fair_action" value="confirm">
+						<input type="hidden" name="entries" value="<?php echo $new_entries; ?>">
 
-						<div class="form-group">
-							<label for="entries">How many entries would you like to purchase?</label><br>
-							<input class="form-control" name="entries" id="entries" style="width:200px" value="<?php echo ( isset( $_POST['entries'] ) ) ? esc_html( $_POST['entries'] ) : ''; ?>">
-						</div>
-
+						<button class="btn btn-default" name="make_changes">
+							<i class="fa fa-chevron-left"></i>
+							Make Changes
+						</button>
 						<button class="btn btn-default">
-							Next Step
+							Complete
 							<i class="fa fa-chevron-right"></i>
 						</button>
 
 					</form>
+
+				<?php } else { ?>
+
+					<?php if ( $this->getPricePerEntry() == 0 ) { ?>
+
+						<p>There is currently no cost to submitting new entries.</p>
+
+					<?php } else { ?>
+
+						<p>
+							Entries cost $<?php echo number_format( $this->getPricePerEntry(), 2 ); ?> each.
+							<?php if ( $this->getNumberFreeAt() > 0 && $this->getFreeQty() > 0 ) { ?>
+								If you purchase <?php echo $this->getNumberFreeAt(); ?> entries, you will get
+								<?php echo $this->getFreeQty(); ?> additional free entr<?php if ( $this->getFreeQty() > 1 ) { ?>ies<?php } else { ?>y<?php } ?>.
+							<?php } ?>
+						</p>
+
+						<form method="post">
+
+							<?php wp_nonce_field( 'spokane_fair_purchase', 'spokane_fair_nonce' ); ?>
+							<input type="hidden" name="spokane_fair_action" value="purchase">
+
+							<div class="form-group">
+								<label for="entries">How many entries would you like to purchase?</label><br>
+								<input class="form-control" name="entries" id="entries" style="width:200px" value="<?php echo ( isset( $_POST['entries'] ) ) ? esc_html( $_POST['entries'] ) : ''; ?>">
+							</div>
+
+							<button class="btn btn-default">
+								Next Step
+								<i class="fa fa-chevron-right"></i>
+							</button>
+
+						</form>
+
+					<?php } ?>
 
 				<?php } ?>
 

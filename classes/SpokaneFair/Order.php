@@ -10,6 +10,8 @@ class Order {
 	private $photographer_id;
 	private $amount;
 	private $entries;
+	private $purchased_entries;
+	private $free_entries;
 	private $created_at;
 	private $paid_at;
 
@@ -25,13 +27,17 @@ class Order {
 				'photographer_id' => $this->photographer_id,
 				'amount' => $this->amount,
 				'entries' => $this->entries,
+				'purchased_entries' => $this->purchased_entries,
+				'free_entries' => $this->free_entries,
 				'created_at' => $this->getCreatedAt( 'Y-m-d H:i:s' ),
 				'paid_at' => ( $this->paid_at === NULL ) ? NULL : $this->getPaidAt( 'Y-m-d H:i:s' )
 			),
 			array(
 				'%d',
-				'%d',
 				'%f',
+				'%d',
+				'%d',
+				'%d',
 				'%s',
 				'%s'
 			)
@@ -52,6 +58,8 @@ class Order {
 			->setPhotographerId( $row->photographer_id )
 			->setAmount( $row->amount )
 			->setEntries( $row->entries )
+			->setPurchasedEntries( $row->purchased_entries )
+			->setFreeEntries( $row->free_entries )
 			->setCreatedAt( $row->created_at )
 			->setPaidAt( $row->paid_at );
 	}
@@ -68,6 +76,8 @@ class Order {
 					'photographer_id' => $this->photographer_id,
 					'amount' => $this->amount,
 					'entries' => $this->entries,
+					'purchased_entries' => $this->purchased_entries,
+					'free_entries' => $this->free_entries,
 					'created_at' => $this->getCreatedAt( 'Y-m-d H:i:s' ),
 					'paid_at' => ( $this->paid_at === NULL ) ? NULL : $this->getPaidAt( 'Y-m-d H:i:s' )
 				),
@@ -76,8 +86,10 @@ class Order {
 				),
 				array(
 					'%d',
-					'%d',
 					'%f',
+					'%d',
+					'%d',
+					'%d',
 					'%s',
 					'%s'
 				),
@@ -184,6 +196,46 @@ class Order {
 	public function setEntries( $entries )
 	{
 		$this->entries = ( is_numeric( $entries ) ) ? intval( $entries ) : NULL;
+
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getPurchasedEntries()
+	{
+		return ( $this->purchased_entries === NULL ) ? 0 : $this->purchased_entries;
+	}
+
+	/**
+	 * @param mixed $purchased_entries
+	 *
+	 * @return Order
+	 */
+	public function setPurchasedEntries( $purchased_entries )
+	{
+		$this->purchased_entries = ( is_numeric( $purchased_entries ) ) ? intval( $purchased_entries ) : NULL;
+
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getFreeEntries()
+	{
+		return ( $this->free_entries === NULL ) ? 0 : $this->free_entries;
+	}
+
+	/**
+	 * @param mixed $free_entries
+	 *
+	 * @return Order
+	 */
+	public function setFreeEntries( $free_entries )
+	{
+		$this->free_entries = ( is_numeric( $free_entries ) ) ? intval( $free_entries ) : NULL;
 
 		return $this;
 	}

@@ -610,4 +610,55 @@ class Entry {
 
 		return $this;
 	}
+
+	/**
+	 * @param $number_of_entries
+	 * @param $number_free_at
+	 * @param $free_qty
+	 *
+	 * @return float|int
+	 */
+	public static function getFreeEntryCount( $number_of_entries, $number_free_at, $free_qty )
+	{
+		$free_entries = 0;
+		
+		if ( $number_free_at > 0 )
+		{
+			$free_instances = floor( $number_of_entries / $number_free_at );
+			if ( $free_instances > 0 )
+			{
+				$free_entries += ( $free_instances * $free_qty );
+			}
+		}
+		
+		return $free_entries;
+	}
+
+	/**
+	 * @param $number_of_entries
+	 * @param $price_per_qty
+	 * @param $number_free_at
+	 * @param $free_qty
+	 *
+	 * @return int
+	 */
+	public static function getPrice( $number_of_entries, $price_per_qty, $number_free_at, $free_qty )
+	{
+		$price = 0;
+		$y = 0;
+		
+		for ( $x=1; $x<=$number_of_entries; $x++ )
+		{
+			$y++;
+			$price += $price_per_qty;
+
+			if ( $y % $number_free_at == 0 )
+			{
+				$y=0;
+				$x += $free_qty;
+			}
+		}
+		
+		return $price;
+	}
 }
