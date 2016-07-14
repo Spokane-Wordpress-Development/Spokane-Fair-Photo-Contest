@@ -230,7 +230,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					</p>
 					<p>
 						If you have paid for your entries, it may take a little while to show that they are paid here.
-						You can still submit your entries in the meantime.
+						Please contact us if it takes too long.
 					</p>
 
 					<p>

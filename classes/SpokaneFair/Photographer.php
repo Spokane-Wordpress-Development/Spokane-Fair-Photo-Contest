@@ -335,7 +335,7 @@ class Photographer {
 	 */
 	public function getEntriesLeftCount()
 	{
-		return $this->getEntriesOrderedCount() - $this->getEntriesUsedCount();
+		return $this->getPaidEntries() - $this->getEntriesUsedCount();
 	}
 
 	/**
@@ -351,6 +351,22 @@ class Photographer {
 		}
 
 		return $count;
+	}
+
+	public function getPaidEntries()
+	{
+		$count = 0;
+
+		foreach ( $this->getOrders() as $order )
+		{
+			if ( $order->getPaidAt() !== NULL )
+			{
+				$count += $order->getPurchasedEntries();
+			}
+		}
+
+		return $count;
+
 	}
 
 	/**
