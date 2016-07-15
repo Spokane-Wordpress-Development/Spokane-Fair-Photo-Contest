@@ -303,7 +303,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 
 			<?php } ?>
 
-			<?php if ( $this->getPhotographer()->getEntriesOrderedCount() > 0 ) { ?>
+			<?php if ( $this->getPhotographer()->getPaidEntryCount() > 0 ) { ?>
 
 				<p>
 					You have submitted
@@ -312,7 +312,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					</strong>
 					of
 					<strong>
-						<?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?>
+						<?php echo $this->getPhotographer()->getPaidEntryCount(); ?>
 					</strong>
 					purchased entries.
 				</p>
@@ -613,7 +613,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					<tr>
 						<th style="color:#000">Entries Used</th>
 						<td style="color:#000">
-							<?php echo $this->getPhotographer()->getEntriesUsedCount(); ?>/<?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?>
+							<?php echo $this->getPhotographer()->getEntriesUsedCount(); ?>/<?php echo $this->getPhotographer()->getPaidEntryCount(); ?>
 						</td>
 						<td>
 							<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'entries' ) ); ?>">
@@ -627,7 +627,7 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 					<tr>
 						<th style="color:#000">Entries Left</th>
 						<td style="color:#000">
-							<?php echo $this->getPhotographer()->getEntriesLeftCount(); ?>/<?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?>
+							<?php echo $this->getPhotographer()->getEntriesLeftCount(); ?>/<?php echo $this->getPhotographer()->getPaidEntryCount(); ?>
 						</td>
 						<td>
 							<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>

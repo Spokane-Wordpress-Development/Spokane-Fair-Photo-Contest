@@ -335,7 +335,7 @@ class Photographer {
 	 */
 	public function getEntriesLeftCount()
 	{
-		return $this->getPaidEntries() - $this->getEntriesUsedCount();
+		return $this->getPaidEntries() + $this->getFreeEntries() - $this->getEntriesUsedCount();
 	}
 
 	/**
