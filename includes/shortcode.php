@@ -4,6 +4,25 @@
 
 $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 
+if ( $action == 'delete-order' && isset( $_GET['id'] ) )
+{
+	$found = FALSE;
+
+	foreach ( $this->getPhotographer()->getOrders() as $order )
+	{
+		if ( $order->getId() == $_GET['id'] )
+		{
+			$this->getPhotographer()->deleteOrder( $order->getId() );
+			$found = TRUE;
+		}
+	}
+
+	if ( ! $found )
+	{
+		$this->addError( 'The order you are trying to delete is no longer available.' );
+	}
+}
+
 ?>
 
 <div id="spokane-fair-photos-shortcode">
@@ -263,7 +282,13 @@ $action = ( isset( $_GET['action'] ) ) ? $_GET['action'] : '';
 						<?php foreach ( $this->getPhotographer()->getOrders() as $order ) { ?>
 							<tr>
 								<td style="color:#000"><?php echo $order->getCreatedAt( 'n/j/Y' ); ?></td>
-								<td style="color:#000"><?php echo $order->getEntries(); ?></td>
+								<td style="color:#000" nowrap="">
+									<?php echo $order->getEntries(); ?>
+									<?php if ( $order->getPaidAt() === NULL ) { ?>
+										-
+										<a href="#" class="sf-delete-order" data-id="<?php echo $order->getId(); ?>" style="color:red">Delete This Order</a>
+									<?php } ?>
+								</td>
 								<td style="color:#000">$<?php echo number_format( $order->getAmount(), 2 ); ?></td>
 								<td style="color:#000">
 									<?php if ( $order->getPaidAt() === NULL ) { ?>

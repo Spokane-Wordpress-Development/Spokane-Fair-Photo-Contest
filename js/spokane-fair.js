@@ -1,4 +1,4 @@
-var ok_to_submit = FALSE;
+var ok_to_submit = false;
 
 (function($){
 
@@ -69,6 +69,15 @@ var ok_to_submit = FALSE;
             e.preventDefault();
             var src = $(this).data('image');
             tb_show( '', src );
+        });
+
+        $('.sf-delete-order').click(function(e){
+            e.preventDefault();
+            var id = $(this).data('id');
+            var b = confirm('If you made a mistake, you are allowed to delete any unpaid order. Would you like to delete this order?');
+            if (b) {
+                window.location = '?action=delete-order&id=' + id;
+            }
         });
 
     });

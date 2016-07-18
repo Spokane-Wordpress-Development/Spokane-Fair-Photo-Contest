@@ -436,4 +436,19 @@ class Photographer {
 
 		return NULL;
 	}
+
+	/**
+	 * @param $id
+	 */
+	public function deleteOrder( $id )
+	{
+		foreach( $this->getOrders() as $order )
+		{
+			if ( $order->getId() == $id )
+			{
+				$order->delete();
+				unset( $this->orders[ $id ] );
+			}
+		}
+	}
 }
