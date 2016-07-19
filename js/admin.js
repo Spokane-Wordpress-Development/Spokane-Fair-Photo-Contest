@@ -6,9 +6,10 @@
 
             e.preventDefault();
             var id = $(this).data('id');
+            var photographer = $(this).data('photographer');
             var b = confirm('Are you sure you want to delete this submission?');
             if (b) {
-                window.location = '?page=spokane_fair_photographers&action=view&id=1&delete_entry=' + id;
+                window.location = '?page=spokane_fair_photographers&action=view&id=' + photographer + '&delete_entry=' + id;
             }
         });
 
@@ -16,9 +17,10 @@
 
             e.preventDefault();
             var id = $(this).data('id');
+            var photographer = $(this).data('photographer');
             var b = confirm('Are you sure you want to delete this order?');
             if (b) {
-                window.location = '?page=spokane_fair_photographers&action=view&id=1&delete_order=' + id;
+                window.location = '?page=spokane_fair_photographers&action=view&id=' + photographer + '&delete_order=' + id;
             }
         });
 

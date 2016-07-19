@@ -120,7 +120,7 @@ if ( isset( $_GET[ 'action' ] ) )
 							<?php } ?>
 						</td>
 						<td>
-							<a href="#" data-id="<?php echo $order->getId(); ?>" class="btn btn-danger sf-admin-delete-order">
+							<a href="#" data-photographer="<?php echo $photographer->getId(); ?>" data-id="<?php echo $order->getId(); ?>" class="btn btn-danger sf-admin-delete-order">
 								<i class="fa fa-times"></i>
 								Delete Order
 							</a>
@@ -174,7 +174,7 @@ if ( isset( $_GET[ 'action' ] ) )
 							<td><?php echo $entry->getTitle(); ?></td>
 							<td><?php echo $entry->getCategory()->getTitle(); ?></td>
 							<td>
-								<a href="#" data-id="<?php echo $entry->getId(); ?>" class="btn btn-danger sf-admin-delete-photo">
+								<a href="#" data-photographer="<?php echo $photographer->getId(); ?>" data-id="<?php echo $entry->getId(); ?>" class="btn btn-danger sf-admin-delete-photo">
 									<i class="fa fa-times"></i>
 									Delete Submission
 								</a>
