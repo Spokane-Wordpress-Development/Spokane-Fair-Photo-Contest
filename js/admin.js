@@ -2,13 +2,23 @@
 
     $(function(){
 
-        $('.sf-delete-photo').click(function(e){
+        $('.sf-admin-delete-photo').click(function(e){
 
             e.preventDefault();
             var id = $(this).data('id');
             var b = confirm('Are you sure you want to delete this submission?');
             if (b) {
                 window.location = '?page=spokane_fair_photographers&action=view&id=1&delete_entry=' + id;
+            }
+        });
+
+        $('.sf-admin-delete-order').click(function(e){
+
+            e.preventDefault();
+            var id = $(this).data('id');
+            var b = confirm('Are you sure you want to delete this order?');
+            if (b) {
+                window.location = '?page=spokane_fair_photographers&action=view&id=1&delete_order=' + id;
             }
         });
 

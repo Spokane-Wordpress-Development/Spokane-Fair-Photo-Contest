@@ -51,6 +51,11 @@ if ( isset( $_GET[ 'action' ] ) )
 				$photographer->deleteEntry( $_GET['delete_entry'] );
 			}
 
+			if ( isset( $_GET['delete_order'] ) && is_numeric( $_GET['delete_order'] ) )
+			{
+				$photographer->deleteOrder( $_GET['delete_order'] );
+			}
+
 			$paid = ( isset( $_GET['paid'] ) && is_numeric( $_GET['paid'] ) ) ? intval( $_GET['paid'] ) : 0;
 			if ( isset( $photographer->getOrders()[$paid] ) && $photographer->getOrders()[$paid]->getPaidAt() === NULL )
 			{
@@ -95,6 +100,7 @@ if ( isset( $_GET[ 'action' ] ) )
 					<th>Entries Purchased</th>
 					<th>Amount Due</th>
 					<th>Payment Info</th>
+					<th>Delete</th>
 				</tr>
 				</thead>
 				<?php foreach ( $photographer->getOrders() as $order ) { ?>
@@ -112,6 +118,12 @@ if ( isset( $_GET[ 'action' ] ) )
 								Paid on <?php echo $order->getPaidAt( 'n/j/Y' ); ?>
 								(<a href="admin.php?page=spokane_fair_photographers&action=view&id=<?php echo $photographer->getId(); ?>&unpaid=<?php echo $order->getId(); ?>">remove payment</a>)
 							<?php } ?>
+						</td>
+						<td>
+							<a href="#" data-id="<?php echo $order->getId(); ?>" class="btn btn-danger sf-admin-delete-order">
+								<i class="fa fa-times"></i>
+								Delete Order
+							</a>
 						</td>
 					</tr>
 				<?php } ?>
@@ -162,9 +174,9 @@ if ( isset( $_GET[ 'action' ] ) )
 							<td><?php echo $entry->getTitle(); ?></td>
 							<td><?php echo $entry->getCategory()->getTitle(); ?></td>
 							<td>
-								<a href="#" data-id="<?php echo $entry->getId(); ?>" class="btn btn-danger sf-delete-photo">
+								<a href="#" data-id="<?php echo $entry->getId(); ?>" class="btn btn-danger sf-admin-delete-photo">
 									<i class="fa fa-times"></i>
-									Delete
+									Delete Submission
 								</a>
 							</td>
 						</tr>
