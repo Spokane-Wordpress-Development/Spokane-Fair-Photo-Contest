@@ -436,7 +436,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 
 				<div class="alert alert-info">
 					<strong>Note:</strong>
-					Photos must be at least 1920 pixels wide or 1080 pixels tall and must be a JPG format.
+					Photos must not exceed 1920 pixels wide, and 1080 pixels high, and must be in JPG format.
 				</div>
 
 				<div class="row">
@@ -475,12 +475,15 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 							</div>
 
 							<div class="well" id="sf_submit_well">
-								<button id="sf_submit_entry_add" class="btn btn-default">
-									Submit
-								</button>
-								<a href="<?php echo $this->add_to_querystring( array(), TRUE ); ?>" class="btn btn-danger">
-									Cancel
-								</a>
+								<div class="form-butons">
+									<button id="sf_submit_entry_add" class="btn btn-default">
+										Submit
+									</button>
+									<a href="<?php echo $this->add_to_querystring( array(), TRUE ); ?>" class="btn btn-danger">
+										Cancel
+									</a>
+								</div>
+								<div class="form-wait"></div>
 							</div>
 
 						</form>
@@ -517,7 +520,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 
 				<div class="alert alert-info">
 					<strong>Note:</strong>
-					Photos must be at least 1920 pixels wide or 1080 pixels tall and must be a JPG format.
+					Photos must not exceed 1920 pixels wide, and 1080 pixels high, and must be in JPG format.
 				</div>
 
 				<div class="row">

@@ -5,7 +5,7 @@ namespace SpokaneFair;
 class Controller {
 	
 	const VERSION = '1.1.0';
-	const VERSION_JS = '1.1.1';
+	const VERSION_JS = '1.1.2';
 	const VERSION_CSS = '1.1.0';
 
 	const IMG_THUMB = 'spokane-fair-thumb';
@@ -283,9 +283,22 @@ class Controller {
 						if ( count( $this->errors ) == 0 )
 						{
 							$image = getimagesize( $_FILES['file']['tmp_name'] );
-							if ( $image[0] < 1920 && $image[1] < 1080 )
+
+							/* landscape */
+							if ( $image[0] >= $image[1] )
 							{
-								$this->addError( 'Photos must be at least 1920 pixels wide or 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+								if ( $image[0] > 1920 && $image[1] > 1080 )
+								{
+									$this->addError( 'Landscape photos cannot exceed 1920 pixels wide by 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+								}
+							}
+							/* portrait */
+							else
+							{
+								if ( $image[0] > 1080 && $image[1] > 1920 )
+								{
+									$this->addError( 'Portrait photos cannot exceed 1080 pixels wide by 1920 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+								}
 							}
 						}
 
@@ -366,9 +379,22 @@ class Controller {
 						if ( count( $this->errors ) == 0 && ! empty( $_FILES['file']['tmp_name'] ) )
 						{
 							$image = getimagesize( $_FILES['file']['tmp_name'] );
-							if ( $image[0] < 1920 && $image[1] < 1080 )
+
+							/* landscape */
+							if ( $image[0] >= $image[1] )
 							{
-								$this->addError( 'Photos must be at least 1920 pixels wide or 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+								if ( $image[0] > 1920 && $image[1] > 1080 )
+								{
+									$this->addError( 'Landscape photos cannot exceed 1920 pixels wide by 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+								}
+							}
+							/* portrait */
+							else
+							{
+								if ( $image[0] > 1080 && $image[1] > 1920 )
+								{
+									$this->addError( 'Portrait photos cannot exceed 1080 pixels wide by 1920 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+								}
 							}
 						}
 

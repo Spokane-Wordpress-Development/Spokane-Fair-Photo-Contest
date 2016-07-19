@@ -4,7 +4,7 @@ var ok_to_submit = false;
 
     $(function(){
 
-        $('#sf_submit_entry_add').click(function(e){
+        $('#sf_submit_entry_form').on('click', '#sf_submit_entry_add', function(e){
 
             if (!ok_to_submit) {
 
@@ -23,9 +23,9 @@ var ok_to_submit = false;
                 } else if (parts[parts.length - 1].toUpperCase() !== 'JPG') {
                     alert('Please choose file ending in .jpg')
                 } else {
-                    ok_to_submit = TRUE;
-                    $('#sf_submit_well').html('<strong>Please wait while your image is uploaded (may take a few moments) ...</strong>');
+                    ok_to_submit = true;
                     $(this).trigger('click');
+                    $('#sf_submit_well').html('<strong>Please wait while your image is uploaded (may take a few moments) ...</strong>');
                 }
             }
         });
@@ -47,7 +47,7 @@ var ok_to_submit = false;
                 } else if (file.length > 0 && parts[parts.length-1].toUpperCase() !== 'JPG') {
                     alert('Please choose file ending in .jpg')
                 } else {
-                    ok_to_submit = TRUE;
+                    ok_to_submit = true;
                     $(this).trigger('click');
                 }
             }
