@@ -451,4 +451,19 @@ class Photographer {
 			}
 		}
 	}
+
+	/**
+	 * @param $id
+	 */
+	public function deleteEntry( $id )
+	{
+		foreach( $this->getEntries() as $entry )
+		{
+			if ( $entry->getId() == $id )
+			{
+				$entry->delete();
+				unset( $this->entries[ $id ] );
+			}
+		}
+	}
 }

@@ -46,6 +46,11 @@ if ( isset( $_GET[ 'action' ] ) )
 
 			<?php
 
+			if ( isset( $_GET['delete_entry'] ) && is_numeric( $_GET['delete_entry'] ) )
+			{
+				$photographer->deleteEntry( $_GET['delete_entry'] );
+			}
+
 			$paid = ( isset( $_GET['paid'] ) && is_numeric( $_GET['paid'] ) ) ? intval( $_GET['paid'] ) : 0;
 			if ( isset( $photographer->getOrders()[$paid] ) && $photographer->getOrders()[$paid]->getPaidAt() === NULL )
 			{
@@ -127,6 +132,7 @@ if ( isset( $_GET[ 'action' ] ) )
 							<th>Code</th>
 							<th>Title</th>
 							<th>Category</th>
+							<th>Delete</th>
 						</tr>
 					</thead>
 					<?php foreach ( $photographer->getEntries() as $entry ) { ?>
@@ -155,6 +161,12 @@ if ( isset( $_GET[ 'action' ] ) )
 							<td><?php echo $entry->getCode(); ?></td>
 							<td><?php echo $entry->getTitle(); ?></td>
 							<td><?php echo $entry->getCategory()->getTitle(); ?></td>
+							<td>
+								<a href="#" data-id="<?php echo $entry->getId(); ?>" class="btn btn-danger sf-delete-photo">
+									<i class="fa fa-times"></i>
+									Delete
+								</a>
+							</td>
 						</tr>
 					<?php } ?>
 				</table>
