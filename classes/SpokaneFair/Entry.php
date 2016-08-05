@@ -205,8 +205,13 @@ class Entry {
 		}
 	}
 
-	public function getCode( $add_extension=FALSE )
+	public function getCode( $add_extension = FALSE, $add_photographer_name = FALSE )
 	{
+		if ( $add_photographer_name )
+		{
+			return str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . str_replace( '_', '-', $this->getTitle( TRUE ) ) . '_' . $this->photographer->getFullName( TRUE ) . '.jpg';
+		}
+
 		return $this->getCategory()->getCode() . '_' . str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . $this->getTitle( TRUE ) . ( ( $add_extension ) ? '.jpg' : '' );
 	}
 

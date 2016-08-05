@@ -103,7 +103,7 @@ ksort( $categories );
 			}
 
 			$src = str_replace( $baseurl, $basedir, $src[0] );
-			$name = $entry->getCode( TRUE );
+			$name = $entry->getCode( TRUE, ( $_GET['export'] == 'names' ) ? TRUE : FALSE );
 			copy( $src, $folder . '/' . $name );
 			$categories[ $code ][] = $name;
 		}
@@ -176,6 +176,9 @@ ksort( $categories );
 			<?php } else { ?>
 				<a href="admin.php?page=<?php echo $_GET['page']; ?>&export=true" class="btn btn-warning">
 					Export All Photos to Uploads Folder
+				</a>
+				<a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names" class="btn btn-warning">
+					Export w/ Photographer Names
 				</a>
 			<?php } ?>
 		</form>

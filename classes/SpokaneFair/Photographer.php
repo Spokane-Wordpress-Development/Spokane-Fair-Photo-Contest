@@ -140,11 +140,30 @@ class Photographer {
 	}
 
 	/**
-	 * @return string
+	 * @param bool $url_format
+	 *
+	 * @return mixed|string
 	 */
-	public function getFullName()
+	public function getFullName( $url_format=FALSE )
 	{
-		return trim( $this->getFirstName() . ' ' . $this->getLastName() );
+		$full_name = trim( $this->getFirstName() . ' ' . $this->getLastName() );
+
+		if ( $url_format )
+		{
+			$full_name = str_replace( ' ', '-', $full_name );
+
+			$patterns = array();
+			$replacements = array();
+
+			$patterns[1] = '/[ ]/';
+			$patterns[0] = '/[^a-zA-Z0-9-]/';
+			$replacements[0] = '-';
+			$replacements[1] = '';
+
+			$full_name = strtolower( preg_replace( $patterns, $replacements, $full_name ) );
+		}
+
+		return $full_name;
 	}
 
 	/**
