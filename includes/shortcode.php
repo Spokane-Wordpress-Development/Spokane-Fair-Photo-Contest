@@ -147,13 +147,15 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 							<?php } ?>
 						</p>
 
+					<?php } ?>
+
 						<form method="post">
 
 							<?php wp_nonce_field( 'spokane_fair_purchase', 'spokane_fair_nonce' ); ?>
 							<input type="hidden" name="spokane_fair_action" value="purchase">
 
 							<div class="form-group">
-								<label for="entries">How many entries would you like to purchase?</label><br>
+								<label for="entries">How many entries would you like<?php if ( $this->getPricePerEntry() > 0 ) { ?> to purchase<?php } ?>?</label><br>
 								<input class="form-control" name="entries" id="entries" style="width:200px" value="<?php echo ( isset( $_POST['entries'] ) ) ? esc_html( $_POST['entries'] ) : ''; ?>">
 							</div>
 
@@ -163,8 +165,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 							</button>
 
 						</form>
-
-					<?php } ?>
 
 				<?php } ?>
 
