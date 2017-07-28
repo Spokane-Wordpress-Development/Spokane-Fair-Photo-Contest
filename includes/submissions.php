@@ -220,7 +220,7 @@ ksort( $categories );
                         </th>
                         <td>
                             <select id="spokane_fair_composition_score">
-                                <?php for ( $x = 0; $x <= 9; $x ++ ) { ?>
+                                <?php for ( $x = 0; $x <= 4; $x ++ ) { ?>
                                     <option value="<?php echo $x; ?>"<?php if ( $entry->getCompositionScore() == $x ) { ?> selected <?php } ?>>
                                         <?php echo $x; ?>
                                     </option>
@@ -234,7 +234,7 @@ ksort( $categories );
                         </th>
                         <td>
                             <select id="spokane_fair_impact_score">
-                                <?php for ( $x = 0; $x <= 9; $x ++ ) { ?>
+                                <?php for ( $x = 0; $x <= 4; $x ++ ) { ?>
                                     <option value="<?php echo $x; ?>"<?php if ( $entry->getImpactScore() == $x ) { ?> selected <?php } ?>>
                                         <?php echo $x; ?>
                                     </option>
@@ -248,7 +248,7 @@ ksort( $categories );
                         </th>
                         <td>
                             <select id="spokane_fair_technical_score">
-                                <?php for ( $x = 0; $x <= 9; $x ++ ) { ?>
+                                <?php for ( $x = 0; $x <= 4; $x ++ ) { ?>
                                     <option value="<?php echo $x; ?>"<?php if ( $entry->getTechnicalScore() == $x ) { ?> selected <?php } ?>>
                                         <?php echo $x; ?>
                                     </option>
@@ -262,7 +262,7 @@ ksort( $categories );
                         </th>
                         <td>
                             <select id="spokane_fair_total_score">
-                                <?php for ( $x = 0; $x <= 99; $x ++ ) { ?>
+                                <?php for ( $x = 0; $x <= 12; $x ++ ) { ?>
                                     <option value="<?php echo $x; ?>"<?php if ( $entry->getTotalScore() == $x ) { ?> selected <?php } ?>>
                                         <?php echo $x; ?>
                                     </option>
