@@ -12,6 +12,11 @@ class Entry {
 	private $category_id;
 	private $photo_post_id;
 	private $title;
+	private $is_finalist = FALSE;
+	private $composition_score;
+	private $impact_score;
+	private $technical_score;
+	private $total_score;
 	private $created_at;
 	private $updated_at;
 	
@@ -123,6 +128,16 @@ class Entry {
 				->update();
 		}
 
+		if ( property_exists( $row, 'is_finalist' ) )
+        {
+            $this
+                ->setIsFinalist( $row->is_finalist )
+                ->setCompositionScore( $row->composition_score )
+                ->setImpactScore( $row->impact_score )
+                ->setTechnicalScore( $row->technical_score )
+                ->setTotalScore( $row->total_score );
+        }
+
 		if ( property_exists( $row, 'category_code' ) )
 		{
 			$category = new Category;
@@ -165,7 +180,12 @@ class Entry {
 					'category_id' => $this->category_id,
 					'photo_post_id' => $this->photo_post_id,
 					'title' => $this->title,
-					'updated_at' => $this->getUpdatedAt( 'Y-m-d H:i:s' )
+					'is_finalist' => $this->is_finalist,
+					'composition_score' => $this->composition_score,
+ 					'impact_score' => $this->impact_score,
+ 					'technical_score' => $this->technical_score,
+ 					'total_score' => $this->total_score,
+ 					'updated_at' => $this->getUpdatedAt( 'Y-m-d H:i:s' )
 				),
 				array(
 					'id' => $this->id
@@ -176,6 +196,11 @@ class Entry {
 					'%d',
 					'%d',
 					'%s',
+                    '%d',
+                    '%d',
+                    '%d',
+                    '%d',
+                    '%d',
 					'%s'
 				),
 				array(
@@ -212,7 +237,7 @@ class Entry {
 			return str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . str_replace( '_', '-', $this->getTitle( TRUE ) ) . '_' . $this->photographer->getFullName( TRUE ) . '.jpg';
 		}
 
-		return $this->getCategory()->getCode() . '_' . str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . $this->getTitle( TRUE ) . ( ( $add_extension ) ? '.jpg' : '' );
+		return $this->getCategory()->getCode() . '-' . str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . $this->getTitle( TRUE ) . ( ( $add_extension ) ? '.jpg' : '' );
 	}
 
 	/**
@@ -336,7 +361,7 @@ class Entry {
 			$replacements[0] = '_';
 			$replacements[1] = '';
 
-			return ( $url_format ) ? strtolower( preg_replace( $patterns, $replacements, $this->title ) ) : $this->title;
+			return ( $url_format ) ? preg_replace( $patterns, $replacements, $this->title ) : $this->title;
 		}
 	}
 
@@ -351,6 +376,134 @@ class Entry {
 
 		return $this;
 	}
+
+    /**
+     * @return bool
+     */
+    public function isFinalist()
+    {
+        return ( $this->is_finalist === TRUE );
+    }
+
+    /**
+     * @param $is_finalist
+     *
+     * @return $this
+     */
+    public function setIsFinalist( $is_finalist )
+    {
+        $this->is_finalist = ( $is_finalist === TRUE || $is_finalist == 1 );
+
+        return $this;
+    }
+
+    /**
+     * @param bool $for_print
+     *
+     * @return int|string
+     */
+    public function getCompositionScore( $for_print = TRUE )
+    {
+        if ( $for_print )
+        {
+            return ( $this->composition_score === NULL ) ? '' : $this->composition_score;
+        }
+
+        return ( $this->composition_score === NULL ) ? 0 : $this->composition_score;
+    }
+
+    /**
+     * @param $composition_score
+     *
+     * @return $this
+     */
+    public function setCompositionScore( $composition_score )
+    {
+        $this->composition_score = $composition_score;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $for_print
+     *
+     * @return mixed
+     */
+    public function getImpactScore( $for_print = TRUE )
+    {
+        if ( $for_print )
+        {
+            return ( $this->impact_score === NULL ) ? '' : $this->impact_score;
+        }
+
+        return ( $this->impact_score === NULL ) ? 0 : $this->impact_score;
+    }
+
+    /**
+     * @param $impact_score
+     *
+     * @return $this
+     */
+    public function setImpactScore( $impact_score )
+    {
+        $this->impact_score = $impact_score;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $for_print
+     *
+     * @return mixed
+     */
+    public function getTechnicalScore( $for_print = TRUE )
+    {
+        if ( $for_print )
+        {
+            return ( $this->technical_score === NULL ) ? '' : $this->technical_score;
+        }
+
+        return ( $this->technical_score === NULL ) ? 0 : $this->technical_score;
+    }
+
+    /**
+     * @param $technical_score
+     *
+     * @return $this
+     */
+    public function setTechnicalScore( $technical_score )
+    {
+        $this->technical_score = $technical_score;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $for_print
+     *
+     * @return mixed
+     */
+    public function getTotalScore( $for_print = TRUE )
+    {
+        if ( $for_print )
+        {
+            return ( $this->total_score === NULL ) ? '' : $this->total_score;
+        }
+
+        return ( $this->total_score === NULL ) ? 0 : $this->total_score;
+    }
+
+    /**
+     * @param $total_score
+     *
+     * @return $this
+     */
+    public function setTotalScore( $total_score )
+    {
+        $this->total_score = $total_score;
+
+        return $this;
+    }
 
 	/**
 	 * @param null $format
@@ -411,6 +564,11 @@ class Entry {
 	 */
 	public function getPhotographer()
 	{
+	    if ( $this->photographer === NULL )
+        {
+            $this->photographer = new Photographer( $this->photographer_id );
+        }
+
 		return $this->photographer;
 	}
 

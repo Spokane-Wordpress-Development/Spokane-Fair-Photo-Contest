@@ -78,7 +78,7 @@ if ( isset( $_GET[ 'action' ] ) )
 				<a href="admin.php?page=spokane_fair_photographers" class="btn btn-default">
 					Back
 				</a>
-				<a href="http://local.wordpress.dev/wp-admin/user-edit.php?user_id=<?php echo $photographer->getId(); ?>&wp_http_referer=<?php echo esc_url( $_SERVER['REQUEST_URI'] ); ?>" class="btn btn-default">
+				<a href="/wp-admin/user-edit.php?user_id=<?php echo $photographer->getId(); ?>&wp_http_referer=<?php echo esc_url( $_SERVER['REQUEST_URI'] ); ?>" class="btn btn-default">
 					Edit Photographer
 				</a>
 			</p>

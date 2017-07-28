@@ -4,8 +4,8 @@ namespace SpokaneFair;
 
 class Controller {
 	
-	const VERSION = '1.1.0';
-	const VERSION_JS = '1.1.3';
+	const VERSION = '1.1.1';
+	const VERSION_JS = '1.1.4';
 	const VERSION_CSS = '1.1.0';
 
 	const IMG_THUMB = 'spokane-fair-thumb';
@@ -102,6 +102,11 @@ class Controller {
 					category_id INT(11) DEFAULT NULL,
 					photo_post_id INT(11) DEFAULT NULL,
 					title VARCHAR(50) DEFAULT NULL,
+					is_finalist TINYINT DEFAULT NULL,
+					composition_score INT(11) DEFAULT NULL,
+					impact_score INT(11) DEFAULT NULL,
+					technical_score INT(11) DEFAULT NULL,
+					total_score INT(11) DEFAULT NULL,
 					created_at DATETIME DEFAULT NULL,
 					updated_at DATETIME DEFAULT NULL,
 					PRIMARY KEY  (id),
@@ -650,6 +655,18 @@ class Controller {
 		$category = new Category( $_REQUEST['id'] );
 		$category->delete();
 	}
+
+    public function update_entry()
+    {
+        $entry = new Entry( $_REQUEST['id'] );
+        $entry
+            ->setIsFinalist( $_REQUEST['is_finalist'] )
+            ->setCompositionScore( $_REQUEST['composition_score'] )
+            ->setImpactScore( $_REQUEST['impact_score'] )
+            ->setTechnicalScore( $_REQUEST['technical_score'] )
+            ->setTotalScore( $_REQUEST['total_score'] )
+            ->update();
+    }
 
 	public function extra_profile_fields()
 	{

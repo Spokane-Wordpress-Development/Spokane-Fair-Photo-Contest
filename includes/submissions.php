@@ -149,6 +149,144 @@ ksort( $categories );
 
 		?></pre>
 
+    <?php } elseif ( isset( $_GET['edit'] ) ) { ?>
+
+        <?php $entry = new \SpokaneFair\Entry( $_GET['edit'] ); ?>
+
+        <?php if ( $entry->getId() === NULL ) { ?>
+
+            <h1>Entry Not Found</h1>
+            <p>
+                <a href="admin.php?page=spokane_fair_submissions">
+                    Back to List
+                </a>
+            </p>
+
+        <?php } else { ?>
+
+            <?php
+
+            $thumb = wp_get_attachment_image( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_THUMB );
+            $full = wp_get_attachment_image_src( $entry->getPhotoPostId(), 'full' );
+
+            $width = $full[1];
+            $height = $full[2];
+
+            if ( $width >= $height )
+            {
+                $full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL_LANDSCAPE );
+            }
+            else
+            {
+                $full = wp_get_attachment_image_src( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_FULL_PORTRAIT );
+            }
+
+            ?>
+
+            <h1>
+                '<?php echo $entry->getTitle(); ?>'
+                By
+                <?php echo $entry->getPhotographer()->getFullName(); ?>
+            </h1>
+            <p>
+                <a href="admin.php?page=spokane_fair_submissions">
+                    Back to List
+                </a>
+            </p>
+
+            <form autocomplete="off">
+
+                <input type="hidden" id="spokane_fair_entry_id" value="<?php echo $entry->getId(); ?>">
+
+                <table class="form-table">
+                    <tr>
+                        <th>
+                            <label for="spokane_fair_is_finalist">Finalist:</label>
+                        </th>
+                        <td>
+                            <select id="spokane_fair_is_finalist">
+                                <option value="0"<?php if ( ! $entry->isFinalist() ) { ?> selected<?php } ?>>
+                                    No
+                                </option>
+                                <option value="1"<?php if ( $entry->isFinalist() ) { ?> selected<?php } ?>>
+                                    Yes
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="spokane_fair_composition_score">Composition Score:</label>
+                        </th>
+                        <td>
+                            <select id="spokane_fair_composition_score">
+                                <?php for ( $x = 0; $x <= 9; $x ++ ) { ?>
+                                    <option value="<?php echo $x; ?>"<?php if ( $entry->getCompositionScore() == $x ) { ?> selected <?php } ?>>
+                                        <?php echo $x; ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="spokane_fair_impact_score">Impact Score:</label>
+                        </th>
+                        <td>
+                            <select id="spokane_fair_impact_score">
+                                <?php for ( $x = 0; $x <= 9; $x ++ ) { ?>
+                                    <option value="<?php echo $x; ?>"<?php if ( $entry->getImpactScore() == $x ) { ?> selected <?php } ?>>
+                                        <?php echo $x; ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="spokane_fair_technical_score">Technical Score:</label>
+                        </th>
+                        <td>
+                            <select id="spokane_fair_technical_score">
+                                <?php for ( $x = 0; $x <= 9; $x ++ ) { ?>
+                                    <option value="<?php echo $x; ?>"<?php if ( $entry->getTechnicalScore() == $x ) { ?> selected <?php } ?>>
+                                        <?php echo $x; ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="spokane_fair_total_score">Total Score:</label>
+                        </th>
+                        <td>
+                            <select id="spokane_fair_total_score">
+                                <?php for ( $x = 0; $x <= 99; $x ++ ) { ?>
+                                    <option value="<?php echo $x; ?>"<?php if ( $entry->getTotalScore() == $x ) { ?> selected <?php } ?>>
+                                        <?php echo $x; ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <a href="#" class="page-title-action" id="spokane-fair-entry-update">
+                                Update
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+
+            <a href="<?php echo $full[0]; ?>" target="_blank">
+                <img src="<?php echo $full[0]; ?>" style="max-width: 100%;">
+            </a>
+
+        <?php } ?>
+
 	<?php } else { ?>
 
 		<h1>
@@ -193,7 +331,13 @@ ksort( $categories );
 					<td><a href="admin.php?page=spokane_fair_submissions&sort=c.title&dir=<?php echo ( $sort == 'c.title' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Category</a></td>
 					<td><a href="admin.php?page=spokane_fair_submissions&sort=e.created_at&dir=<?php echo ( $sort == 'e.created_at' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Date</a></td>
 					<td><a href="admin.php?page=spokane_fair_submissions&sort=ln.last_name&dir=<?php echo ( $sort == 'ln.last_name' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Photographer</a></td>
-				</tr>
+                    <td><a href="admin.php?page=spokane_fair_submissions&sort=e.is_finalist&dir=<?php echo ( $sort == 'e.is_finalist' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Finalist</a></td>
+                    <td><a href="admin.php?page=spokane_fair_submissions&sort=e.composition_score&dir=<?php echo ( $sort == 'e.composition_score' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Composition</a></td>
+                    <td><a href="admin.php?page=spokane_fair_submissions&sort=e.impact_score&dir=<?php echo ( $sort == 'e.impact_score' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Impact</a></td>
+                    <td><a href="admin.php?page=spokane_fair_submissions&sort=e.technical_score&dir=<?php echo ( $sort == 'e.technical_score' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Technical</a></td>
+                    <td><a href="admin.php?page=spokane_fair_submissions&sort=e.total_score&dir=<?php echo ( $sort == 'e.total_score' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Total</a></td>
+				    <td>Edit</td>
+                </tr>
 			</thead>
 			<?php foreach ( $entries as $entry ) { ?>
 				<?php if ( ! isset( $_GET['category_code'] ) || ( isset( $_GET['category_code'] ) && $_GET['category_code'] == $entry->getCategory()->getCode() ) ) { ?>
@@ -229,6 +373,16 @@ ksort( $categories );
 								<?php echo $entry->getPhotographer()->getFullName(); ?>
 							</a>
 						</td>
+                        <td><?php echo ( $entry->isFinalist() ) ? 'YES' : 'NO'; ?></td>
+                        <td><?php echo $entry->getCompositionScore(); ?></td>
+                        <td><?php echo $entry->getImpactScore(); ?></td>
+                        <td><?php echo $entry->getTechnicalScore(); ?></td>
+                        <td><?php echo $entry->getTotalScore(); ?></td>
+                        <td>
+                            <a href="admin.php?page=spokane_fair_submissions&edit=<?php echo $entry->getId(); ?>" class="btn btn-default">
+                                Edit
+                            </a>
+                        </td>
 					</tr>
 				<?php } ?>
 			<?php } ?>

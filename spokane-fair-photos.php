@@ -83,4 +83,9 @@ if (is_admin() )
 	{
 		$controller->delete_category();
 	} );
+
+    add_action( 'wp_ajax_spokane_fair_entry_update', function() use ( $controller )
+    {
+        $controller->update_entry();
+    } );
 }

@@ -135,6 +135,39 @@
             }
         });
 
+        $('#spokane-fair-entry-update').click(function(e){
+            e.preventDefault();
+            var id = $('#spokane_fair_entry_id').val();
+            var is_finalist = $('#spokane_fair_is_finalist').val();
+            var composition_score = $('#spokane_fair_composition_score').val();
+            var impact_score = $('#spokane_fair_impact_score').val();
+            var technical_score = $('#spokane_fair_technical_score').val();
+            var total_score = $('#spokane_fair_total_score').val();
+
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    action: 'spokane_fair_entry_update',
+                    id: id,
+                    is_finalist: is_finalist,
+                    composition_score: composition_score,
+                    impact_score: impact_score,
+                    technical_score: technical_score,
+                    total_score: total_score
+                },
+                success: function()
+                {
+                    location.href = '?page=spokane_fair_submissions';
+                },
+                error: function()
+                {
+                    alert('There was an error. Please try again.');
+                }
+            });
+        });
+
     });
 
 })(jQuery);
