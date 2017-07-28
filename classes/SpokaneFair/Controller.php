@@ -5,7 +5,7 @@ namespace SpokaneFair;
 class Controller {
 	
 	const VERSION = '1.1.1';
-	const VERSION_JS = '1.1.4';
+	const VERSION_JS = '1.1.5';
 	const VERSION_CSS = '1.1.0';
 
 	const IMG_THUMB = 'spokane-fair-thumb';
@@ -664,7 +664,6 @@ class Controller {
             ->setCompositionScore( $_REQUEST['composition_score'] )
             ->setImpactScore( $_REQUEST['impact_score'] )
             ->setTechnicalScore( $_REQUEST['technical_score'] )
-            ->setTotalScore( $_REQUEST['total_score'] )
             ->update();
     }
 

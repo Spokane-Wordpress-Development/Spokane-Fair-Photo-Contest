@@ -134,8 +134,7 @@ class Entry {
                 ->setIsFinalist( $row->is_finalist )
                 ->setCompositionScore( $row->composition_score )
                 ->setImpactScore( $row->impact_score )
-                ->setTechnicalScore( $row->technical_score )
-                ->setTotalScore( $row->total_score );
+                ->setTechnicalScore( $row->technical_score );
         }
 
 		if ( property_exists( $row, 'category_code' ) )
@@ -184,7 +183,7 @@ class Entry {
 					'composition_score' => $this->composition_score,
  					'impact_score' => $this->impact_score,
  					'technical_score' => $this->technical_score,
- 					'total_score' => $this->total_score,
+ 					'total_score' => $this->getTotalScore(),
  					'updated_at' => $this->getUpdatedAt( 'Y-m-d H:i:s' )
 				),
 				array(
@@ -398,17 +397,10 @@ class Entry {
     }
 
     /**
-     * @param bool $for_print
-     *
-     * @return int|string
+     * @return int
      */
-    public function getCompositionScore( $for_print = TRUE )
+    public function getCompositionScore()
     {
-        if ( $for_print )
-        {
-            return ( $this->composition_score === NULL ) ? '' : $this->composition_score;
-        }
-
         return ( $this->composition_score === NULL ) ? 0 : $this->composition_score;
     }
 
@@ -419,23 +411,16 @@ class Entry {
      */
     public function setCompositionScore( $composition_score )
     {
-        $this->composition_score = $composition_score;
+        $this->composition_score = ( is_numeric( $composition_score ) ) ? intval( $composition_score ) : NULL;
 
         return $this;
     }
 
     /**
-     * @param bool $for_print
-     *
-     * @return mixed
+     * @return int
      */
-    public function getImpactScore( $for_print = TRUE )
+    public function getImpactScore()
     {
-        if ( $for_print )
-        {
-            return ( $this->impact_score === NULL ) ? '' : $this->impact_score;
-        }
-
         return ( $this->impact_score === NULL ) ? 0 : $this->impact_score;
     }
 
@@ -446,23 +431,16 @@ class Entry {
      */
     public function setImpactScore( $impact_score )
     {
-        $this->impact_score = $impact_score;
+        $this->impact_score = ( is_numeric( $impact_score ) ) ? intval( $impact_score ) : NULL;
 
         return $this;
     }
 
     /**
-     * @param bool $for_print
-     *
-     * @return mixed
+     * @return int
      */
-    public function getTechnicalScore( $for_print = TRUE )
+    public function getTechnicalScore()
     {
-        if ( $for_print )
-        {
-            return ( $this->technical_score === NULL ) ? '' : $this->technical_score;
-        }
-
         return ( $this->technical_score === NULL ) ? 0 : $this->technical_score;
     }
 
@@ -473,24 +451,17 @@ class Entry {
      */
     public function setTechnicalScore( $technical_score )
     {
-        $this->technical_score = $technical_score;
+        $this->technical_score = ( is_numeric( $technical_score ) ) ? intval( $technical_score ) : NULL;
 
         return $this;
     }
 
     /**
-     * @param bool $for_print
-     *
-     * @return mixed
+     * @return int
      */
-    public function getTotalScore( $for_print = TRUE )
+    public function getTotalScore()
     {
-        if ( $for_print )
-        {
-            return ( $this->total_score === NULL ) ? '' : $this->total_score;
-        }
-
-        return ( $this->total_score === NULL ) ? 0 : $this->total_score;
+        return $this->getCompositionScore() + $this->getImpactScore() + $this->getTechnicalScore();
     }
 
     /**

@@ -142,7 +142,6 @@
             var composition_score = $('#spokane_fair_composition_score').val();
             var impact_score = $('#spokane_fair_impact_score').val();
             var technical_score = $('#spokane_fair_technical_score').val();
-            var total_score = $('#spokane_fair_total_score').val();
 
             $.ajax({
                 url: ajaxurl,
@@ -154,8 +153,7 @@
                     is_finalist: is_finalist,
                     composition_score: composition_score,
                     impact_score: impact_score,
-                    technical_score: technical_score,
-                    total_score: total_score
+                    technical_score: technical_score
                 },
                 success: function()
                 {

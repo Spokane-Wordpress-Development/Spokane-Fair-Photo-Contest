@@ -257,20 +257,6 @@ ksort( $categories );
                         </td>
                     </tr>
                     <tr>
-                        <th>
-                            <label for="spokane_fair_total_score">Total Score:</label>
-                        </th>
-                        <td>
-                            <select id="spokane_fair_total_score">
-                                <?php for ( $x = 0; $x <= 15; $x ++ ) { ?>
-                                    <option value="<?php echo $x; ?>"<?php if ( $entry->getTotalScore() == $x ) { ?> selected <?php } ?>>
-                                        <?php echo $x; ?>
-                                    </option>
-                                <?php } ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
                         <td></td>
                         <td>
                             <a href="#" class="page-title-action" id="spokane-fair-entry-update">
