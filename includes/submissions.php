@@ -22,6 +22,19 @@ foreach ( $entries as $entry )
 
 ksort( $categories );
 
+/** @var \SpokaneFair\Photographer[] $categories */
+$photographers = array();
+
+foreach ( $entries as $entry )
+{
+    if ( ! array_key_exists( $entry->getPhotographerId(), $photographers ) )
+    {
+        $photographers[ $entry->getPhotographerId() ] = $entry->getPhotographer()->getFullName();
+    }
+}
+
+asort( $photographers );
+
 ?>
 
 <div class="wrap">
@@ -281,7 +294,6 @@ ksort( $categories );
 
 		<form class="well form-inline" method="get">
 			<input type="hidden" name="page" value="<?php echo $_GET['page']; ?>">
-			<label for="category_code">Filter By Category</label>
 			<select name="category_code" id="category_code" class="select-mono">
 				<option value="">
 					View All Categories
@@ -294,9 +306,19 @@ ksort( $categories );
 					</option>
 				<?php } ?>
 			</select>
+            <select name="photographer_id" id="photographer_id" class="select-mono">
+                <option value="">
+                    View All Photographers
+                </option>
+                <?php foreach ( $photographers as $photographer_id => $photographer_name ) { ?>
+                    <option value="<?php echo $photographer_id; ?>"<?php if ( isset( $_GET['photographer_id'] ) && $_GET['photographer_id'] == $photographer_id ) { ?> selected <?php } ?>>
+                        <?php echo $photographer_name; ?>
+                    </option>
+                <?php } ?>
+            </select>
 			<button class="btn btn-default">Filter</button>
 			<?php if ( isset( $_GET['category_code'] )  ) { ?>
-				<a href="admin.php?page=<?php echo $_GET['page']; ?>" class="btn btn-default">View All Categories</a>
+				<a href="admin.php?page=<?php echo $_GET['page']; ?>" class="btn btn-default">View All</a>
 			<?php } else { ?>
 				<a href="admin.php?page=<?php echo $_GET['page']; ?>&export=true" class="btn btn-warning">
 					Export All Photos to Uploads Folder
@@ -326,7 +348,20 @@ ksort( $categories );
                 </tr>
 			</thead>
 			<?php foreach ( $entries as $entry ) { ?>
-				<?php if ( ! isset( $_GET['category_code'] ) || ( isset( $_GET['category_code'] ) && $_GET['category_code'] == $entry->getCategory()->getCode() ) ) { ?>
+                <?php
+
+                $show = TRUE;
+                if ( isset( $_GET['category_code'] ) && strlen( $_GET['category_code'] ) > 0 && $_GET['category_code'] != $entry->getCategory()->getCode() )
+                {
+                    $show = FALSE;
+                }
+                elseif ( isset( $_GET['photographer_id'] ) && strlen( $_GET['photographer_id'] ) > 0 && $_GET['photographer_id'] != $entry->getPhotographerId() )
+                {
+                    $show = FALSE;
+                }
+
+                ?>
+				<?php if ( $show ) { ?>
 					<?php
 
 					$thumb = wp_get_attachment_image( $entry->getPhotoPostId(), \SpokaneFair\Controller::IMG_THUMB );
