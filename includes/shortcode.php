@@ -356,6 +356,8 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						<tr>
 							<th style="color:#000">Photo / Code</th>
 							<th style="color:#000">Title / Category</th>
+                            <th style="color:#000">Score</th>
+                            <th style="color:#000">Finalist?</th>
 							<?php if ( $this->canSubmitEntry() ) { ?>
 								<th style="color:#000">Manage</th>
 							<?php } ?>
@@ -396,6 +398,37 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 									<?php echo $entry->getCategory()->getTitle(); ?>
 								</p>
 							</td>
+                            <td>
+                                <?php if ( $entry->getTotalScore() == 0 ) { ?>
+                                    <p>No score yet</p>
+                                <?php } else { ?>
+                                    <p>
+                                        <strong>Composition:</strong>
+                                        <?php echo $entry->getCompositionScore(); ?>/5
+                                    </p>
+                                    <p>
+                                        <strong>Impact:</strong>
+                                        <?php echo $entry->getImpactScore(); ?>/5
+                                    </p>
+                                    <p>
+                                        <strong>Technical:</strong>
+                                        <?php echo $entry->getTechnicalScore(); ?>/5
+                                    </p>
+                                    <p>
+                                        <strong>TOTAL:</strong>
+                                        <?php echo $entry->getTotalScore(); ?>/15
+                                    </p>
+                                <?php } ?>
+                            </td>
+                            <td>
+                                <?php if ( $entry->getTotalScore() > 0 ) { ?>
+                                    <?php if ( $entry->isFinalist() ) { ?>
+                                        YES
+                                    <?php } else { ?>
+                                        NO
+                                    <?php } ?>
+                                <?php } ?>
+                            </td>
 							<?php if ( $this->canSubmitEntry() ) { ?>
 								<td style="color:#000">
 									<a href="<?php echo $this->add_to_querystring( array( 'action' => 'edit', 'entry_id' => $entry->getId() ), TRUE ); ?>" class="btn btn-default">
