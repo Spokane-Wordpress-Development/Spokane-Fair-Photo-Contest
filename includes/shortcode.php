@@ -421,12 +421,10 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
                                 <?php } ?>
                             </td>
                             <td>
-                                <?php if ( $entry->getTotalScore() > 0 ) { ?>
-                                    <?php if ( $entry->isFinalist() ) { ?>
-                                        YES
-                                    <?php } else { ?>
-                                        NO
-                                    <?php } ?>
+                                <?php if ( $entry->isFinalist() ) { ?>
+                                    YES
+                                <?php } else { ?>
+                                    NO
                                 <?php } ?>
                             </td>
 							<?php if ( $this->canSubmitEntry() ) { ?>
