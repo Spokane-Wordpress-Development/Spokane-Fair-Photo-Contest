@@ -78,6 +78,18 @@ asort( $photographers );
 
 		foreach ( $entries as $entry )
 		{
+		    if ( isset( $_GET['finalists'] ) )
+            {
+                if ( $_GET['finalists'] == 'yes' && ! $entry->isFinalist() )
+                {
+                    continue;
+                }
+                elseif ( $_GET['finalists'] == 'no' && $entry->isFinalist() )
+                {
+                    continue;
+                }
+            }
+
 			$code = $entry->getCategory()->getCode();
 			$folder = $basedir . '/spokane_fair/' . date('Y') . '/' . $code;
 
@@ -320,12 +332,19 @@ asort( $photographers );
 			<?php if ( isset( $_GET['category_code'] )  ) { ?>
 				<a href="admin.php?page=<?php echo $_GET['page']; ?>" class="btn btn-default">View All</a>
 			<?php } else { ?>
+                <br>
 				<a href="admin.php?page=<?php echo $_GET['page']; ?>&export=true" class="btn btn-warning">
-					Export All Photos to Uploads Folder
+					Export All Photos
 				</a>
 				<a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names" class="btn btn-warning">
 					Export w/ Photographer Names
 				</a>
+                <a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names&finalists=yes" class="btn btn-warning">
+                    Export Finalists
+                </a>
+                <a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names&finalists=no" class="btn btn-warning">
+                    Export non-Finalists
+                </a>
 			<?php } ?>
 		</form>
 
