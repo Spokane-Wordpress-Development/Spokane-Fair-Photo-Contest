@@ -233,7 +233,7 @@ class Entry {
 	{
 		if ( $add_photographer_name )
 		{
-			return str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . str_replace( '_', '-', $this->getTitle( TRUE ) ) . '_' . $this->photographer->getFullName( TRUE ) . '.jpg';
+			return $this->getCategory()->getCode() . '-' . str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . str_replace( '_', '-', $this->getTitle( TRUE ) ) . '_' . $this->photographer->getFullName( TRUE ) . '.jpg';
 		}
 
 		return $this->getCategory()->getCode() . '-' . str_pad( $this->getRandomCode(), 4, '0', STR_PAD_LEFT ) . '_' . $this->getTitle( TRUE ) . ( ( $add_extension ) ? '.jpg' : '' );
@@ -683,6 +683,7 @@ class Entry {
 						meta_key = 'state'
 				) s ON u.ID = s.user_id
 			ORDER BY
+			    e.is_finalist DESC,
 				" . $sort . " " . $dir;
 
 		$rows = $wpdb->get_results( $sql );

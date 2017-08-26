@@ -160,7 +160,7 @@ class Photographer {
 			$replacements[0] = '-';
 			$replacements[1] = '';
 
-			$full_name = strtolower( preg_replace( $patterns, $replacements, $full_name ) );
+			$full_name = preg_replace( $patterns, $replacements, $full_name );
 		}
 
 		return $full_name;
