@@ -614,10 +614,11 @@ class Entry {
 	/**
 	 * @param string $sort
 	 * @param string $dir
+     * @param null|string $code
 	 *
 	 * @return Entry[]
 	 */
-	public static function getAllEntries( $sort='e.id', $dir='DESC' )
+	public static function getAllEntries( $sort='e.id', $dir='DESC', $code = NULL )
 	{
 		global $wpdb;
 		$entries = array();
@@ -682,6 +683,9 @@ class Entry {
 					WHERE
 						meta_key = 'state'
 				) s ON u.ID = s.user_id
+			WHERE
+			    e.id > 0
+			    " . ( ( $code !== NULL ) ? "AND random_code = " . $code : "" ) . "
 			ORDER BY
 			    e.is_finalist DESC,
 				" . $sort . " " . $dir;
@@ -801,4 +805,14 @@ class Entry {
 		
 		return $price;
 	}
+
+    /**
+     * @param $code
+     *
+     * @return Entry[]
+     */
+	public static function getEntryByCode( $code )
+    {
+        return self::getAllEntries( 'e.id', 'DESC', $code );
+    }
 }

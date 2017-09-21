@@ -1,5 +1,7 @@
 <?php
 
+ini_set( 'auto_detect_line_endings', TRUE );
+
 /** @var \SpokaneFair\Controller $this */
 
 $category_code = ( isset( $_GET['category_code'] ) && strlen( $_GET['category_code'] ) > 0 ) ? $_GET['category_code'] : NULL;
@@ -48,6 +50,265 @@ asort( $photographers );
 		<div class="alert alert-danger">
 			There are no submissions yet.
 		</div>
+
+    <?php } elseif( isset( $_GET['import'] ) ) { ?>
+
+        <?php if ( $_GET['import'] == 'true' ) { ?>
+
+            <h1>Import Scores</h1>
+            <p>
+                <a href="admin.php?page=<?php echo $_GET['page']; ?>" class="btn btn-default">
+                    Back
+                </a>
+            </p>
+
+            <p>
+                Upload or browse to an import file below.
+                Must be a CSV file and contain the following columns:
+            </p>
+            <ul style="list-style: disc; padding-left: 25px;">
+                <li><strong>Entry</strong> (Image name or Category + Code, ex: ARCH-1234)</li>
+                <li><strong>Composition</strong> (0 - 5)</li>
+                <li><strong>Impact</strong> (0 - 5)</li>
+                <li><strong>Technical</strong> (0 - 5)</li>
+                <li><strong>Finalist</strong> (Y or N)</li>
+            </ul>
+
+            <p>
+                <input type="hidden" name="sf_score_import_file" id="sf-score-import-file">
+                <input id="sf-score-import-button" class="button-primary" value="Choose File" type="button">
+            </p>
+
+        <?php } else { ?>
+
+            <?php
+
+            $file_is_good = FALSE;
+            $file_error = '';
+            $import_entries = array();
+            $columns = array();
+
+            $file = get_attached_file( $_GET['import'] );
+
+            if ( $file !== FALSE && strlen( $file ) > 0 )
+            {
+                if ( strtoupper( substr( $file, -3 ) ) == 'CSV' )
+                {
+                    $handle = fopen( $file, 'r' );
+
+                    if ( $handle !== FALSE )
+                    {
+                        $columns = fgetcsv( $handle );
+
+                        if ( $columns !== NULL )
+                        {
+                            foreach ( $columns as $index => $column )
+                            {
+                                $columns[ $index ] = strtolower( $column );
+                            }
+
+                            $required_columns = array( 'entry', 'composition', 'impact', 'technical', 'finalist' );
+                            $missing_columns = [];
+
+                            foreach ( $required_columns as $required_column )
+                            {
+                                if ( ! in_array( $required_column, $columns ) )
+                                {
+                                    $missing_columns[] = $required_column;
+                                }
+                            }
+
+                            if ( count( $missing_columns ) == 0 )
+                            {
+                                while ( ( $line = fgetcsv( $handle ) ) !== FALSE )
+                                {
+                                    $import_entries[] = $line;
+                                }
+
+                                if ( count( $import_entries ) > 0 )
+                                {
+                                    $file_is_good = TRUE;
+                                }
+                                else
+                                {
+                                    $file_error = 'Import file contains no data.';
+                                }
+                            }
+                            else
+                            {
+                                $file_error = 'Import file is missing the following column' . ( ( count( $missing_columns ) > 1 ) ? 's' : '' ) . ': ' . implode( ', ', $missing_columns );
+                            }
+                        }
+                        else
+                        {
+                            $file_error = 'The import file appears to be corrupt or invalid.';
+                        }
+                    }
+                    else
+                    {
+                        $file_error = 'The import file could not be opened.';
+                    }
+                }
+                else
+                {
+                    $file_error = 'The import file must be a CSV file.';
+                }
+            }
+            else
+            {
+                $file_error = 'The file you are attempting to use does not exist.';
+            }
+
+            ?>
+
+            <?php if ( ! $file_is_good ) { ?>
+
+                <h1>Import Error</h1>
+                <p><?php echo $file_error; ?></p>
+                <p>
+                    <a href="admin.php?page=<?php echo $_GET['page']; ?>" class="btn btn-default">
+                        Back
+                    </a>
+                </p>
+
+            <?php } else { ?>
+
+                <h1>Import Results</h1>
+                <p>
+                    <a href="admin.php?page=<?php echo $_GET['page']; ?>" class="btn btn-default">
+                        Back
+                    </a>
+                </p>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Entry</th>
+                            <th>Found</th>
+                            <th>Composition</th>
+                            <th>Impact</th>
+                            <th>Technical</th>
+                            <th>Total</th>
+                            <th>Finalist</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ( $import_entries as $import_entry ) { ?>
+
+                            <?php
+
+                            $data = array(
+                                'entry' => '',
+                                'composition' => 0,
+                                'impact' => 0,
+                                'technical' => 0,
+                                'finalist' => 'N',
+                                'comments' => ''
+                            );
+
+                            foreach ( $import_entry as $key => $val )
+                            {
+                                switch ( $columns[ $key ] )
+                                {
+                                    case 'entry':
+                                        $data['entry'] = $val;
+                                        break;
+                                    case 'composition':
+                                        $data['composition'] = $val;
+                                        break;
+                                    case 'impact':
+                                        $data['impact'] = $val;
+                                        break;
+                                    case 'technical':
+                                        $data['technical'] = $val;
+                                        break;
+                                    case 'finalist':
+                                        $data['finalist'] = $val;
+                                        break;
+                                    case 'comments':
+                                        $data['comments'] = $val;
+                                        break;
+                                }
+                            }
+
+                            $entry = new \SpokaneFair\Entry;
+                            $parts = explode( '_', $data['entry'] );
+
+                            if ( count( $parts ) > 1 )
+                            {
+                                $code = preg_replace( '/[^0-9,.]/', '', $parts[0] );
+                                $entries = \SpokaneFair\Entry::getEntryByCode( $code );
+                                if ( count( $entries ) == 1 )
+                                {
+                                    $entry = array_values( $entries )[0];
+                                }
+                            }
+
+                            ?>
+
+                            <tr>
+                                <td><?php echo $data['entry']; ?></td>
+                                <?php if ( $entry->getId() !== NULL ) { ?>
+
+                                    <td>
+                                        <strong style="color:darkgreen;">
+                                            YES
+                                        </strong>
+                                    </td>
+                                    <td nowrap="">
+                                        <?php echo $entry->getCompositionScore(); ?>
+                                        =&gt;
+                                        <?php echo $data['composition']; ?>
+                                    </td>
+                                    <td nowrap="">
+                                        <?php echo $entry->getImpactScore(); ?>
+                                        =&gt;
+                                        <?php echo $data['impact']; ?>
+                                    </td>
+                                    <td nowrap="">
+                                        <?php echo $entry->getTechnicalScore(); ?>
+                                        =&gt;
+                                        <?php echo $data['technical']; ?>
+                                    </td>
+                                    <td nowrap="">
+                                        <?php echo $entry->getTotalScore(); ?>
+                                        =&gt;
+                                        <?php echo intval( $data['composition'] + $data['impact'] + $data['technical'] ); ?>
+                                    </td>
+                                    <td nowrap="">
+                                        <?php echo ( $entry->isFinalist() ) ? 'Y' : 'N'; ?>
+                                        =&gt;
+                                        <?php echo ( strtolower( $data['finalist'] ) == 'y' ) ? 'Y' : 'N'; ?>
+                                    </td>
+
+                                    <?php
+
+                                    $entry
+                                        ->setCompositionScore( $data['composition'] )
+                                        ->setImpactScore( $data['impact'] )
+                                        ->setTechnicalScore( $data['technical'] )
+                                        ->setIsFinalist( ( strtolower( $data['finalist'] ) == 'y' ) )
+                                        ->update();
+
+                                    ?>
+
+                                <?php } else { ?>
+                                    <td>
+                                        <strong style="color:red;">
+                                            NO
+                                        </strong>
+                                    </td>
+                                    <td colspan="5"></td>
+                                <?php } ?>
+                            </tr>
+
+                        <?php } ?>
+                    </tbody>
+                </table>
+
+            <?php } ?>
+
+        <?php } ?>
 
 	<?php } elseif ( isset( $_GET['export'] ) ) { ?>
 
@@ -332,19 +593,23 @@ asort( $photographers );
 			<?php if ( isset( $_GET['category_code'] )  ) { ?>
 				<a href="admin.php?page=<?php echo $_GET['page']; ?>" class="btn btn-default">View All</a>
 			<?php } else { ?>
-                <br>
-				<a href="admin.php?page=<?php echo $_GET['page']; ?>&export=true" class="btn btn-warning">
-					Export All Photos
-				</a>
-				<a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names" class="btn btn-warning">
-					Export w/ Photographer Names
-				</a>
-                <a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names&finalists=yes" class="btn btn-warning">
-                    Export Finalists
-                </a>
-                <a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names&finalists=no" class="btn btn-warning">
-                    Export non-Finalists
-                </a>
+                <p>
+                    <a href="admin.php?page=<?php echo $_GET['page']; ?>&export=true" class="btn btn-warning">
+                        Export All Photos
+                    </a>
+                    <a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names" class="btn btn-warning">
+                        Export w/ Names
+                    </a>
+                    <a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names&finalists=yes" class="btn btn-warning">
+                        Export Finalists
+                    </a>
+                    <a href="admin.php?page=<?php echo $_GET['page']; ?>&export=names&finalists=no" class="btn btn-warning">
+                        Export non-Finalists
+                    </a>
+                    <a href="admin.php?page=<?php echo $_GET['page']; ?>&import=true" class="btn btn-warning">
+                        Import Scores
+                    </a>
+                </p>
 			<?php } ?>
 		</form>
 

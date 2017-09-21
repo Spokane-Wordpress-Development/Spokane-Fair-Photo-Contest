@@ -2,6 +2,44 @@
 
     $(function(){
 
+        $('#sf-score-import-button').click(function(e){
+
+            e.preventDefault();
+
+            var file_frame;
+
+            // If the media frame already exists, reopen it.
+            if ( file_frame ) {
+                file_frame.open();
+                return;
+            }
+
+            // Create the media frame.
+            file_frame = wp.media.frames.file_frame = wp.media({
+                title: 'Choose an Import File',
+                button: {
+                    text: 'Next Step'
+                },
+                multiple: false
+            });
+
+            // When an image is selected, run a callback.
+            file_frame.on( 'select', function() {
+
+                var selection = file_frame.state().get('selection');
+
+                selection.map( function( attachment ) {
+
+                    //console.log(attachment.attributes.filename);
+                    window.location = 'admin.php?page=spokane_fair_submissions&import=' + attachment.attributes.id;
+
+                });
+            });
+
+            // Finally, open the modal
+            file_frame.open();
+        });
+
         $('.sf-admin-delete-photo').click(function(e){
 
             e.preventDefault();
