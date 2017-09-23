@@ -144,6 +144,32 @@ if ( isset( $_GET['spokane_fair_photos_delete'] ) && isset( $_GET['nonce'] ) )
 					<input type="text" id="spokane_fair_paypal_email" name="spokane_fair_paypal_email" value="<?php echo $this->getPayPalEmail(); ?>">
 				</td>
 			</tr>
+            <tr valign="top">
+                <th scope="row">
+                    <label for="spokane_fair_max_width">
+                        Max Pixel Width
+                    </label>
+                </th>
+                <td>
+                    <?php echo $this->getMaxWidth(); ?> pixels
+                </td>
+                <td>
+                    <input type="text" id="spokane_fair_max_width" name="spokane_fair_max_width" value="<?php echo $this->getMaxWidth(); ?>">
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row">
+                    <label for="spokane_fair_max_height">
+                        Max Pixel Height
+                    </label>
+                </th>
+                <td>
+                    <?php echo $this->getMaxHeight(); ?> pixels
+                </td>
+                <td>
+                    <input type="text" id="spokane_fair_max_height" name="spokane_fair_max_height" value="<?php echo $this->getMaxHeight(); ?>">
+                </td>
+            </tr>
 		</table>
 
 		<?php submit_button(); ?>

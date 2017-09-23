@@ -467,7 +467,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 
 				<div class="alert alert-info">
 					<strong>Note:</strong>
-					Photos must not exceed 1920 pixels wide, and 1080 pixels high, and must be in JPG format.
+					Photos must not exceed <?php echo $this->getMaxWidth(); ?> pixels wide, and <?php echo $this->getMaxHeight(); ?> pixels high, and must be in JPG format.
 				</div>
 
 				<div class="row">
@@ -551,7 +551,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 
 				<div class="alert alert-info">
 					<strong>Note:</strong>
-					Photos must not exceed 1920 pixels wide, and 1080 pixels high, and must be in JPG format.
+					Photos must not exceed <?php echo $this->getMaxWidth(); ?> pixels wide, and <?php echo $this->getMaxHeight(); ?> pixels high, and must be in JPG format.
 				</div>
 
 				<div class="row">

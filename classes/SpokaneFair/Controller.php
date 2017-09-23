@@ -5,12 +5,15 @@ namespace SpokaneFair;
 class Controller {
 	
 	const VERSION = '1.1.1';
-	const VERSION_JS = '1.1.5';
+	const VERSION_JS = '1.1.6';
 	const VERSION_CSS = '1.1.0';
 
 	const IMG_THUMB = 'spokane-fair-thumb';
 	const IMG_FULL_LANDSCAPE = 'spokane-fair-full';
 	const IMG_FULL_PORTRAIT = 'spokane-fair-full-landscape';
+
+	const DEFAULT_MAX_WIDTH = 1920;
+	const DEFAULT_MAX_HEIGHT = 1080;
 
 	private $errors;
 	
@@ -144,8 +147,8 @@ class Controller {
 		wp_enqueue_style( 'spokane-fair-css', plugin_dir_url( dirname( __DIR__ ) ) . 'css/spokane-fair.css', array(), ( WP_DEBUG ) ? time() : self::VERSION_CSS );
 
 		add_image_size( self::IMG_THUMB , 200, 200 );
-		add_image_size( self::IMG_FULL_LANDSCAPE , 1920, 1080 );
-		add_image_size( self::IMG_FULL_PORTRAIT , 720, 1080 );
+		add_image_size( self::IMG_FULL_LANDSCAPE , $this->getMaxWidth(), $this->getMaxHeight() );
+		add_image_size( self::IMG_FULL_PORTRAIT , round( $this->getMaxHeight() * ( 2 / 3 ) ), $this->getMaxHeight() );
 
 		if ( $this->photographer === NULL )
 		{
@@ -292,17 +295,17 @@ class Controller {
 							/* landscape */
 							if ( $image[0] >= $image[1] )
 							{
-								if ( $image[0] > 1920 && $image[1] > 1080 )
+								if ( $image[0] > $this->getMaxWidth() && $image[1] > $this->getMaxHeight() )
 								{
-									$this->addError( 'Landscape photos cannot exceed 1920 pixels wide by 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+									$this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
 							}
 							/* portrait */
 							else
 							{
-								if ( $image[0] > 1080 && $image[1] > 1920 )
+								if ( $image[0] > $this->getMaxHeight() && $image[1] > $this->getMaxWidth() )
 								{
-									$this->addError( 'Portrait photos cannot exceed 1080 pixels wide by 1920 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxHeight() . ' pixels wide by ' . $this->getMaxWidth() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
 							}
 						}
@@ -388,17 +391,17 @@ class Controller {
 							/* landscape */
 							if ( $image[0] >= $image[1] )
 							{
-								if ( $image[0] > 1920 && $image[1] > 1080 )
+								if ( $image[0] > $this->getMaxWidth() && $image[1] > $this->getMaxHeight() )
 								{
-									$this->addError( 'Landscape photos cannot exceed 1920 pixels wide by 1080 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+									$this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
 							}
 							/* portrait */
 							else
 							{
-								if ( $image[0] > 1080 && $image[1] > 1920 )
+								if ( $image[0] > $this->getMaxHeight() && $image[1] > $this->getMaxWidth() )
 								{
-									$this->addError( 'Portrait photos cannot exceed 1080 pixels wide by 1920 pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxHeight() . ' pixels wide by ' . $this->getMaxWidth() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
 							}
 						}
@@ -511,6 +514,8 @@ class Controller {
 		register_setting( 'spokane_fair_settings', 'spokane_fair_start_date' );
 		register_setting( 'spokane_fair_settings', 'spokane_fair_end_date' );
 		register_setting( 'spokane_fair_settings', 'spokane_fair_paypal_email' );
+        register_setting( 'spokane_fair_settings', 'spokane_fair_max_width' );
+        register_setting( 'spokane_fair_settings', 'spokane_fair_max_height' );
 	}
 
 	public function getPricePerEntry()
@@ -551,6 +556,18 @@ class Controller {
 		$email = get_option( 'spokane_fair_paypal_email' , '' );
 		return ( is_email( $email ) ) ? $email : '';
 	}
+
+    public function getMaxWidth()
+    {
+        $width = get_option( 'spokane_fair_max_width' , self::DEFAULT_MAX_WIDTH );
+        return ( is_numeric( $width ) ) ? abs( intval( $width ) ) : self::DEFAULT_MAX_WIDTH;
+    }
+
+    public function getMaxHeight()
+    {
+        $height = get_option( 'spokane_fair_max_height' , self::DEFAULT_MAX_HEIGHT );
+        return ( is_numeric( $height ) ) ? abs( intval( $height ) ) : self::DEFAULT_MAX_HEIGHT;
+    }
 
 	/**
 	 * @return bool
