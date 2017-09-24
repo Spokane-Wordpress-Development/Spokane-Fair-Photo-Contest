@@ -305,7 +305,7 @@ class Controller {
 							{
 								if ( $image[0] > $this->getMaxHeight() && $image[1] > $this->getMaxWidth() )
 								{
-									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxHeight() . ' pixels wide by ' . $this->getMaxWidth() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
 							}
 						}
