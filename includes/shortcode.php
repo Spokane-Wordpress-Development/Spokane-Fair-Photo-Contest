@@ -51,7 +51,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 		<?php if ( strlen( $action ) > 0 ) { ?>
 			<p>
 				<a href="<?php echo $this->add_to_querystring( array(), TRUE ); ?>" class="btn btn-default">
-					<i class="fa fa-chevron-left"></i>
 					Back to Main Page
 				</a>
 			</p>
@@ -121,12 +120,10 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						<input type="hidden" name="entries" value="<?php echo $new_entries; ?>">
 
 						<button class="btn btn-default" name="make_changes">
-							<i class="fa fa-chevron-left"></i>
 							Make Changes
 						</button>
 						<button class="btn btn-default">
 							Complete
-							<i class="fa fa-chevron-right"></i>
 						</button>
 
 					</form>
@@ -161,7 +158,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 
 							<button class="btn btn-default">
 								Next Step
-								<i class="fa fa-chevron-right"></i>
 							</button>
 
 						</form>
@@ -184,7 +180,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 					<p>You have not purchased any entries. Click below to purchase one or more entries:</p>
 					<p>
 						<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ) ); ?>">
-							<i class="fa fa-shopping-cart"></i>
 							Purchase Entries
 						</a>
 					</p>
@@ -235,7 +230,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
 							<p>
 								<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ), TRUE ); ?>">
-									<i class="fa fa-camera"></i>
 									Submit a Photo Entry
 								</a>
 							</p>
@@ -254,12 +248,10 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 
 					<p>
 						<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ), TRUE ); ?>">
-							<i class="fa fa-shopping-cart"></i>
 							Purchase More Entries
 						</a>
 						<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
 							<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ), TRUE ); ?>">
-								<i class="fa fa-camera"></i>
 								Submit a Photo Entry
 							</a>
 						<?php } ?>
@@ -345,7 +337,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 				<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
 					<p>
 						<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ), TRUE ); ?>">
-							<i class="fa fa-camera"></i>
 							Upload Another Photo
 						</a>
 					</p>
@@ -430,7 +421,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 							<?php if ( $this->canSubmitEntry() ) { ?>
 								<td style="color:#000">
 									<a href="<?php echo $this->add_to_querystring( array( 'action' => 'edit', 'entry_id' => $entry->getId() ), TRUE ); ?>" class="btn btn-default">
-										<i class="fa fa-edit"></i>
 										Edit
 									</a>
 								</td>
@@ -451,7 +441,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 					<p>You do not have any more enties left.</p>
 					<p>
 						<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ), TRUE ); ?>">
-							<i class="fa fa-shopping-cart"></i>
 							Purchase More Entries
 						</a>
 					</p>
@@ -639,7 +628,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 					<td style="color:#000"><?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?></td>
 					<td>
 						<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ) ); ?>">
-							<i class="fa fa-shopping-cart"></i>
 							Purchase <?php if ( $this->getPhotographer()->getEntriesOrderedCount() > 0 ) { ?>More<?php } ?> Entries
 						</a>
 					</td>
@@ -650,7 +638,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						<td style="color:#000"><?php echo $this->getPhotographer()->getUnpaidEntryCount(); ?></td>
 						<td>
 							<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'ordered' ) ); ?>">
-								<i class="fa fa-usd"></i>
 								Pay Now
 							</a>
 						</td>
@@ -662,7 +649,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						<td style="color:#000"><?php echo $this->getPhotographer()->getPaidEntryCount(); ?></td>
 						<td>
 							<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'ordered' ) ); ?>">
-								<i class="fa fa-usd"></i>
 								View Payments
 							</a>
 						</td>
@@ -676,7 +662,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						</td>
 						<td>
 							<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'entries' ) ); ?>">
-								<i class="fa fa-eye"></i>
 								View Entries
 							</a>
 						</td>
@@ -691,7 +676,6 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						<td>
 							<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
 								<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ) ); ?>">
-									<i class="fa fa-camera"></i>
 									Upload a Photo
 								</a>
 							<?php } ?>
