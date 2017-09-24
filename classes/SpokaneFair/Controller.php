@@ -516,6 +516,7 @@ class Controller {
 		register_setting( 'spokane_fair_settings', 'spokane_fair_paypal_email' );
         register_setting( 'spokane_fair_settings', 'spokane_fair_max_width' );
         register_setting( 'spokane_fair_settings', 'spokane_fair_max_height' );
+        register_setting( 'spokane_fair_settings', 'spokane_fair_custom_login_code' );
 	}
 
 	public function getPricePerEntry()
@@ -567,6 +568,11 @@ class Controller {
     {
         $height = get_option( 'spokane_fair_max_height' , self::DEFAULT_MAX_HEIGHT );
         return ( is_numeric( $height ) ) ? abs( intval( $height ) ) : self::DEFAULT_MAX_HEIGHT;
+    }
+
+    public function getCustomLoginCode()
+    {
+        return get_option( 'spokane_fair_custom_login_code', '' );
     }
 
 	/**

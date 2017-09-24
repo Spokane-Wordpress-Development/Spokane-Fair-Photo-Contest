@@ -170,6 +170,19 @@ if ( isset( $_GET['spokane_fair_photos_delete'] ) && isset( $_GET['nonce'] ) )
                     <input type="text" id="spokane_fair_max_height" name="spokane_fair_max_height" value="<?php echo $this->getMaxHeight(); ?>">
                 </td>
             </tr>
+            <tr valign="top">
+                <th scope="row">
+                    <label for="spokane_fair_custom_login_code">
+                        Custom Login Code
+                    </label>
+                </th>
+                <td>
+                    <?php echo $this->getCustomLoginCode(); ?>
+                </td>
+                <td>
+                    <textarea name="spokane_fair_custom_login_code" id="spokane_fair_custom_login_code"><?php echo htmlspecialchars( $this->getCustomLoginCode() ); ?></textarea>
+                </td>
+            </tr>
 		</table>
 
 		<?php submit_button(); ?>

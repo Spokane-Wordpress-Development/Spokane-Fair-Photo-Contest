@@ -781,6 +781,10 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 
 			<?php } ?>
 
+            <?php if ( strlen( trim( $this->getCustomLoginCode() ) ) > 0 ) { ?>
+                <p><?php echo $this->getCustomLoginCode(); ?></p>
+            <?php } ?>
+
 			<?php wp_login_form( $args ); ?>
 
 			<p>
