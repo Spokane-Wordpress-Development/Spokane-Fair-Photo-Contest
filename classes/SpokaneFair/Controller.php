@@ -158,6 +158,8 @@ class Controller {
 	
 	public function form_capture()
 	{
+	    set_time_limit( 90 );
+
 		if ( isset( $_POST['spokane_fair_action'] ) )
 		{
 			if ( isset( $_POST['spokane_fair_nonce'] ) && wp_verify_nonce( $_POST['spokane_fair_nonce'], 'spokane_fair_' . $_POST['spokane_fair_action'] ) )
