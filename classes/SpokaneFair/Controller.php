@@ -224,7 +224,7 @@ class Controller {
 					
 					case 'purchase':
 
-						$entries = ( isset( $_POST['entries'] ) && is_numeric( $_POST['entries'] ) ) ? intval( $_POST['entries'] ) : 0;
+						$entries = ( isset( $_POST['entries'] ) && is_numeric( $_POST['entries'] ) ) ? round( $_POST['entries'] ) : 0;
 						if ( $entries == 0 )
 						{
 							$this->addError( 'Please enter a valid number of entries' );
@@ -236,7 +236,7 @@ class Controller {
 
 						if ( ! isset( $_POST['make_changes'] ) )
 						{
-							$new_entries = ( isset( $_POST['entries'] ) && is_numeric( $_POST['entries'] ) ) ? intval( $_POST['entries'] ) : 0;
+							$new_entries = ( isset( $_POST['entries'] ) && is_numeric( $_POST['entries'] ) ) ? round( $_POST['entries'] ) : 0;
 
 							if ( $new_entries == 0 )
 							{
@@ -356,7 +356,7 @@ class Controller {
 
 				case 'edit':
 
-					$id = ( is_numeric( $_POST['id'] ) ) ? intval( $_POST['id'] ) : 0;
+					$id = ( is_numeric( $_POST['id'] ) ) ? round( $_POST['id'] ) : 0;
 					$delete = $_POST['delete'];
 					$category_id = $_POST['category_id'];
 					$title = trim( $_POST['title'] );
@@ -563,13 +563,13 @@ class Controller {
     public function getMaxWidth()
     {
         $width = get_option( 'spokane_fair_max_width' , self::DEFAULT_MAX_WIDTH );
-        return ( is_numeric( $width ) ) ? abs( intval( $width ) ) : self::DEFAULT_MAX_WIDTH;
+        return ( is_numeric( $width ) ) ? abs( round( $width ) ) : self::DEFAULT_MAX_WIDTH;
     }
 
     public function getMaxHeight()
     {
         $height = get_option( 'spokane_fair_max_height' , self::DEFAULT_MAX_HEIGHT );
-        return ( is_numeric( $height ) ) ? abs( intval( $height ) ) : self::DEFAULT_MAX_HEIGHT;
+        return ( is_numeric( $height ) ) ? abs( round( $height ) ) : self::DEFAULT_MAX_HEIGHT;
     }
 
     public function getCustomLoginCode()
