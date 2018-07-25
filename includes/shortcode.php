@@ -12,8 +12,11 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 	{
 		if ( $order->getId() == $_GET['id'] )
 		{
-			$this->getPhotographer()->deleteOrder( $order->getId() );
-			$found = TRUE;
+		    if ( $order->getPaidAt() === NULL )
+            {
+                $this->getPhotographer()->deleteOrder( $order->getId() );
+                $found = TRUE;
+            }
 		}
 	}
 

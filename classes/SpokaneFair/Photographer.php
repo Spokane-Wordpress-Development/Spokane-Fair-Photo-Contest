@@ -163,7 +163,7 @@ class Photographer {
 			$full_name = preg_replace( $patterns, $replacements, $full_name );
 		}
 
-		return $full_name;
+		return trim( $full_name );
 	}
 
 	/**
@@ -173,6 +173,11 @@ class Photographer {
 	{
 		return ( $this->email === NULL ) ? '' : $this->email;
 	}
+
+	public function getFullNameOrEmail()
+    {
+        return ( strlen( $this->getFullName() ) == 0 ) ? $this->getEmail() : $this->getFullName();
+    }
 
 	/**
 	 * @param mixed $email

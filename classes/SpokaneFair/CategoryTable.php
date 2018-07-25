@@ -101,6 +101,8 @@ class CategoryTable extends \WP_List_Table {
 				" . $wpdb->prefix . Category::TABLE_NAME . " c
 				LEFT JOIN " . $wpdb->prefix . Entry::TABLE_NAME . " e
 					ON c.id = e.category_id
+			WHERE
+			    e.photographer_id IN ( SELECT DISTINCT photographer_id FROM " . $wpdb->prefix . Order::TABLE_NAME . " )
 			GROUP BY
 				c.id";
 		if ( isset( $_GET[ 'orderby' ] ) )

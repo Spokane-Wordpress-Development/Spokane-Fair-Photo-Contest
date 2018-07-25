@@ -675,7 +675,7 @@ asort( $photographers );
 						<td><?php echo $entry->getCreatedAt( 'n/j/Y g:i a' ); ?></td>
 						<td>
 							<a href="admin.php?page=spokane_fair_photographers&action=view&id=<?php echo $entry->getPhotographerId(); ?>">
-								<?php echo $entry->getPhotographer()->getFullName(); ?>
+								<?php echo $entry->getPhotographer()->getFullNameOrEmail(); ?>
 							</a>
 						</td>
                         <td><?php echo ( $entry->isFinalist() ) ? 'YES' : 'NO'; ?></td>
