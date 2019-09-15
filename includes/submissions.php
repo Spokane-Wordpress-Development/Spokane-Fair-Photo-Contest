@@ -366,7 +366,7 @@ asort( $photographers );
 				{
 					foreach ( scandir( $folder ) as $item)
 					{
-						if ( $item != '.' && $item != '..')
+                        if ( $item != '.' && $item != '..' && !is_dir($folder . '/' . $item))
 						{
 							unlink( $folder . '/' . $item );
 						}
@@ -390,8 +390,10 @@ asort( $photographers );
 
 			$src = str_replace( $baseurl, $basedir, $src[0] );
 			$name = $entry->getCode( TRUE, ( $_GET['export'] == 'names' ) ? TRUE : FALSE );
-			copy( $src, $folder . '/' . $name );
-			$categories[ $code ][] = $name;
+			if ($name && $src) {
+                copy($src, $folder . '/' . $name);
+                $categories[$code][] = $name;
+            }
 		}
 
 		ksort( $categories );
