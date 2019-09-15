@@ -1,2 +1,2 @@
-# Spokane Interstate Fair Photo Submissions
-A custom plugin for the Spokane Interstate Fair Photo Contest
+# Photo Contest Manager
+A custom plugin for managing photo contests.

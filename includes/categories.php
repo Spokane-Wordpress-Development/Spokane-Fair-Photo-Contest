@@ -9,6 +9,7 @@ if ( isset( $_GET[ 'action' ] ) )
 	{
 		case 'add':
 		case 'edit':
+        case 'bulk':
 			$action = $_GET[ 'action' ];
 	}
 }
@@ -148,13 +149,68 @@ if ( isset( $_GET[ 'action' ] ) )
 
 		<?php } ?>
 
+    <?php } elseif ($action == 'bulk') { ?>
+
+        <h1>
+            Bulk Edit Categories
+            <a href="?page=<?php echo $_REQUEST['page']; ?>" class="page-title-action">
+                Cancel
+            </a>
+        </h1>
+
+        <form autocomplete="off">
+            <table class="form-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Visible</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach (\SpokaneFair\Category::getAllCategories() as $category) { ?>
+                    <tr>
+                        <td><?php echo $category->getId(); ?></td>
+                        <td>
+                            <input id="code<?php echo $category->getId(); ?>" class="spokane_fair_category_code" data-id="<?php echo $category->getId(); ?>" value="<?php echo esc_html( $category->getCode() ); ?>">
+                        </td>
+                        <td>
+                            <input id="title<?php echo $category->getId(); ?>" class="spokane_fair_category_title" data-id="<?php echo $category->getId(); ?>" value="<?php echo esc_html( $category->getTitle() ); ?>">
+                        </td>
+                        <td>
+                            <select id="visible<?php echo $category->getId(); ?>" class="spokane_fair_category_is_visible" data-id="<?php echo $category->getId(); ?>">
+                                <option value="1">
+                                    Yes
+                                </option>
+                                <option value="0"<?php if ( ! $category->isVisible() ) { ?> selected<?php } ?>>
+                                    No
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+
+            <p>
+                <a href="#" class="page-title-action" id="spokane-fair-category-bulk">
+                    Save Changes
+                </a>
+            </p>
+
+        </form>
+
 	<?php } else { ?>
 
 		<h1>
-			Spokane Interstate Fair Photo Categories
+			Categories
 			<a href="?page=<?php echo $_REQUEST['page']; ?>&action=add" class="page-title-action">
 				Add Category
 			</a>
+            <a href="?page=<?php echo $_REQUEST['page']; ?>&action=bulk" class="page-title-action">
+                Bulk Edit
+            </a>
 		</h1>
 
 		<?php

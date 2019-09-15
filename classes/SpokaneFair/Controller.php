@@ -4,9 +4,9 @@ namespace SpokaneFair;
 
 class Controller {
 	
-	const VERSION = '1.1.1';
-	const VERSION_JS = '1.1.6';
-	const VERSION_CSS = '1.1.0';
+	const VERSION = '1.2.0';
+	const VERSION_JS = '1.2.0';
+	const VERSION_CSS = '1.2.0';
 
 	const IMG_THUMB = 'spokane-fair-thumb';
 	const IMG_FULL_LANDSCAPE = 'spokane-fair-full';
@@ -104,6 +104,8 @@ class Controller {
 					photographer_id INT(11) DEFAULT NULL,
 					category_id INT(11) DEFAULT NULL,
 					photo_post_id INT(11) DEFAULT NULL,
+					width INT(11) DEFAULT NULL,
+					height INT(11) DEFAULT NULL,
 					title VARCHAR(50) DEFAULT NULL,
 					is_finalist TINYINT DEFAULT NULL,
 					composition_score INT(11) DEFAULT NULL,
@@ -290,6 +292,9 @@ class Controller {
 							$this->addError( 'Please choose file ending in .jpg' );
 						}
 
+						$height = null;
+						$width = null;
+
 						if ( count( $this->errors ) == 0 )
 						{
 							$image = getimagesize( $_FILES['file']['tmp_name'] );
@@ -297,7 +302,10 @@ class Controller {
 							/* landscape */
 							if ( $image[0] >= $image[1] )
 							{
-								if ( $image[0] > $this->getMaxWidth() && $image[1] > $this->getMaxHeight() )
+							    $width = $image[0];
+							    $height = $image[1];
+
+								if ( $width > $this->getMaxWidth() && $height > $this->getMaxHeight() )
 								{
 									$this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
@@ -305,7 +313,10 @@ class Controller {
 							/* portrait */
 							else
 							{
-								if ( $image[0] > $this->getMaxHeight() && $image[1] > $this->getMaxWidth() )
+                                $width = $image[1];
+                                $height = $image[0];
+
+								if ( $height > $this->getMaxHeight() && $width > $this->getMaxWidth() )
 								{
 									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
@@ -339,6 +350,8 @@ class Controller {
 										->setCategoryId( $category_id )
 										->setTitle( $title )
 										->setPhotoPostId( $attachment_id )
+                                        ->setHeight($height)
+                                        ->setWidth($width)
 										->create();
 
 									if ( $entry->getId() !== NULL )
@@ -386,6 +399,9 @@ class Controller {
 							$this->addError( 'Please choose file ending in .jpg' );
 						}
 
+                        $height = null;
+                        $width = null;
+
 						if ( count( $this->errors ) == 0 && ! empty( $_FILES['file']['tmp_name'] ) )
 						{
 							$image = getimagesize( $_FILES['file']['tmp_name'] );
@@ -393,7 +409,10 @@ class Controller {
 							/* landscape */
 							if ( $image[0] >= $image[1] )
 							{
-								if ( $image[0] > $this->getMaxWidth() && $image[1] > $this->getMaxHeight() )
+							    $width = $image[0];
+							    $height = $image[1];
+
+								if ( $width > $this->getMaxWidth() || $height > $this->getMaxHeight() )
 								{
 									$this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
@@ -401,7 +420,10 @@ class Controller {
 							/* portrait */
 							else
 							{
-								if ( $image[0] > $this->getMaxHeight() && $image[1] > $this->getMaxWidth() )
+                                $width = $image[1];
+                                $height = $image[0];
+
+								if ( $height > $this->getMaxHeight() || $width > $this->getMaxWidth() )
 								{
 									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxHeight() . ' pixels wide by ' . $this->getMaxWidth() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
@@ -429,7 +451,10 @@ class Controller {
 									$attachment_data = wp_generate_attachment_metadata( $attachment_id, $file['file'] );
 									wp_update_attachment_metadata( $attachment_id,  $attachment_data );
 
-									$entry->setPhotoPostId( $attachment_id );
+									$entry
+                                        ->setPhotoPostId( $attachment_id )
+                                        ->setWidth($width)
+                                        ->setHeight($height);
 								}
 								else
 								{
@@ -444,6 +469,10 @@ class Controller {
 
 						if ( count( $this->errors ) == 0 )
 						{
+						    if ($this->letEntrantsPickFinals() && isset($_POST['sf_is_finalist'])) {
+						        $entry->setIsFinalist($_POST['sf_is_finalist'] == 1);
+                            }
+
 							$entry
 								->setTitle( $title )
 								->setCategoryId( $category_id )
@@ -501,7 +530,7 @@ class Controller {
 
 	public function admin_menus()
 	{
-		add_menu_page( 'Spokane Fair', 'Spokane Fair', 'manage_options', 'spokane_fair_photos', array( $this, 'print_settings_page' ), 'dashicons-format-gallery' );
+		add_menu_page( 'Photo Contest Manager', 'Photo Contest Manager', 'manage_options', 'spokane_fair_photos', array( $this, 'print_settings_page' ), 'dashicons-format-gallery' );
 		add_submenu_page( 'spokane_fair_photos', 'Settings', 'Settings', 'manage_options', 'spokane_fair_photos' );
 		add_submenu_page( 'spokane_fair_photos', 'Categories', 'Categories', 'manage_options', 'spokane_fair_categories', array( $this, 'print_categories_page' ) );
 		add_submenu_page( 'spokane_fair_photos', 'Photographers', 'Photographers', 'manage_options', 'spokane_fair_photographers', array( $this, 'print_photographers_page' ) );
@@ -519,7 +548,17 @@ class Controller {
         register_setting( 'spokane_fair_settings', 'spokane_fair_max_width' );
         register_setting( 'spokane_fair_settings', 'spokane_fair_max_height' );
         register_setting( 'spokane_fair_settings', 'spokane_fair_custom_login_code' );
+        register_setting( 'spokane_fair_settings', 'spokane_fair_let_entrants_pick_finals' );
 	}
+
+    /**
+     * @return bool
+     */
+	public function letEntrantsPickFinals()
+    {
+        $let = get_option( 'spokane_fair_let_entrants_pick_finals' , 0 );
+        return ($let == 1);
+    }
 
 	public function getPricePerEntry()
 	{
@@ -664,6 +703,23 @@ class Controller {
 			->setIsVisible( $_REQUEST['is_visible'] )
 			->create();
 	}
+
+	public function bulk_update_categories()
+    {
+        $categories = $_REQUEST['categories'];
+        $categories = str_replace('\"', '"', $categories);
+        $categories = json_decode($categories, TRUE);
+
+        foreach ($categories as $category) {
+
+            $cat = new Category( $category['id'] );
+            $cat
+                ->setCode( $category['code'] )
+                ->setTitle( $category['title'] )
+                ->setIsVisible( $category['is_visible'] )
+                ->update();
+        }
+    }
 
 	public function update_category()
 	{

@@ -251,7 +251,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 
 					<p>
 						<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ), TRUE ); ?>">
-							Purchase More Entries
+							Get More Entries
 						</a>
 						<?php if ( $this->getPhotographer()->getEntriesLeftCount() > 0 ) { ?>
 							<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'submit' ), TRUE ); ?>">
@@ -265,7 +265,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 							<tr>
 								<th style="color:#000">Date<br>&nbsp;</th>
 								<th style="color:#000">
-									Entries Purchased<br>
+									Entries Obtained<br>
 									<em style="font-size:75%">
 										including any free entries
 									</em>
@@ -391,6 +391,14 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 									<strong>Category</strong><br>
 									<?php echo $entry->getCategory()->getTitle(); ?>
 								</p>
+                                <?php if ($entry->hasDimensions()) { ?>
+                                    <p>
+                                        <strong>Dimensions</strong><br>
+                                        <?php echo $entry->getWidth(); ?>
+                                        X
+                                        <?php echo $entry->getHeight(); ?>
+                                    </p>
+                                <?php } ?>
 							</td>
                             <td>
                                 <?php if ( $entry->getTotalScore() == 0 ) { ?>
@@ -444,7 +452,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 					<p>You do not have any more enties left.</p>
 					<p>
 						<a class="btn btn-default" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ), TRUE ); ?>">
-							Purchase More Entries
+							Get More Entries
 						</a>
 					</p>
 				</div>
@@ -576,6 +584,22 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 								<input class="form-control" name="title" id="sf_title" value="<?php echo esc_html( $entry->getTitle() ); ?>">
 							</div>
 
+                            <?php if ($this->letEntrantsPickFinals()) { ?>
+                                <div class="form-group">
+                                    <label for="sf_is_finalist">
+                                        Finalist
+                                    </label>
+                                    <select name="sf_is_finalist" id="sf_is_finalist" class="form-control">
+                                        <option value="0"<?php if ( ! $entry->isFinalist() ) { ?> selected<?php } ?>>
+                                            No
+                                        </option>
+                                        <option value="1"<?php if ( $entry->isFinalist() ) { ?> selected<?php } ?>>
+                                            Yes
+                                        </option>
+                                    </select>
+                                </div>
+                            <?php } ?>
+
 							<div class="form-group">
 								<label for="sf_file">
 									Upload a New Photo
@@ -623,7 +647,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 			<table class="table table-bordered table-striped">
 				<tr>
 					<th style="color:#000">
-						Entries Purchased<br>
+						Entries Obtained<br>
 						<em style="font-size:75%">
 							including any free entries
 						</em>
@@ -631,7 +655,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 					<td style="color:#000"><?php echo $this->getPhotographer()->getEntriesOrderedCount(); ?></td>
 					<td>
 						<a class="btn btn-default btn-block" href="<?php echo $this->add_to_querystring( array( 'action' => 'purchase' ) ); ?>">
-							Purchase <?php if ( $this->getPhotographer()->getEntriesOrderedCount() > 0 ) { ?>More<?php } ?> Entries
+							Get <?php if ( $this->getPhotographer()->getEntriesOrderedCount() > 0 ) { ?>More<?php } ?> Entries
 						</a>
 					</td>
 				</tr>

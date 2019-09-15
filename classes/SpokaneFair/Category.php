@@ -244,37 +244,47 @@ class Category {
 		return $this;
 	}
 
-	/**
-	 * @return Category[]
-	 */
-	public static function getAllVisibleCategories()
-	{
-		global $wpdb;
-		$categories = array();
+    /**
+     * @param null|bool $visible
+     * @return Category[]
+     */
+	public static function getAllCategories($visible = null)
+    {
+        global $wpdb;
+        $categories = array();
 
-		$sql = "
+        $sql = "
 			SELECT
 				COUNT(e.id) AS entry_count,
 				c.*
 			FROM
 				" . $wpdb->prefix . self::TABLE_NAME . " c
 				LEFT JOIN " . $wpdb->prefix . Entry::TABLE_NAME . " e
-					ON c.id = e.category_id
-			WHERE
-				c.is_visible = 1
-			GROUP BY
-				c.id
-			ORDER BY
-				c.title";
+					ON c.id = e.category_id";
+        if ($visible !== null) {
+            $sql .= "
+                WHERE c.is_visible = " . (($visible) ? "1" : "0");
+        }
+        $sql .= "
+			GROUP BY c.id
+			ORDER BY c.title";
 
-		$rows = $wpdb->get_results( $sql );
-		foreach( $rows as $row )
-		{
-			$category = new Category;
-			$category->loadFromRow( $row );
-			$categories[ $category->getId() ] = $category;
-		}
-		
-		return $categories;
+        $rows = $wpdb->get_results( $sql );
+        foreach( $rows as $row )
+        {
+            $category = new Category;
+            $category->loadFromRow( $row );
+            $categories[ $category->getId() ] = $category;
+        }
+
+        return $categories;
+    }
+
+	/**
+	 * @return Category[]
+	 */
+	public static function getAllVisibleCategories()
+	{
+		return self::getAllCategories(true);
 	}
 }

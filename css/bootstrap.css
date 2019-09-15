@@ -1345,6 +1345,9 @@ output {
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+select.form-control {
+    font-size: 20px !important;
+}
 .form-control:focus {
     border-color: #66afe9;
     outline: 0;

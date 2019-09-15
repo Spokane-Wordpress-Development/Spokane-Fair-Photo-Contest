@@ -42,7 +42,7 @@ if ( isset( $_GET['spokane_fair_photos_delete'] ) && isset( $_GET['nonce'] ) )
 <div class="wrap">
 
 	<h1>
-		Spokane Interstate Fair Photo Submission Settings
+		Photo Contest Manager Submission Settings
 	</h1>
 
 	<?php if ( $message !== NULL ) { ?>
@@ -181,6 +181,26 @@ if ( isset( $_GET['spokane_fair_photos_delete'] ) && isset( $_GET['nonce'] ) )
                 </td>
                 <td>
                     <textarea name="spokane_fair_custom_login_code" id="spokane_fair_custom_login_code"><?php echo htmlspecialchars( $this->getCustomLoginCode() ); ?></textarea>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row">
+                    <label for="spokane_fair_let_entrants_pick_finals">
+                        Let Entrants Pick Finals
+                    </label>
+                </th>
+                <td>
+                    <?php echo ($this->letEntrantsPickFinals()) ? 'YES' : 'NO'; ?>
+                </td>
+                <td>
+                    <select id="spokane_fair_let_entrants_pick_finals" name="spokane_fair_let_entrants_pick_finals">
+                        <option value="0"<?php if (!$this->letEntrantsPickFinals()) {?> selected<?php } ?>>
+                            NO
+                        </option>
+                        <option value="1"<?php if ($this->letEntrantsPickFinals()) {?> selected<?php } ?>>
+                            YES
+                        </option>
+                    </select>
                 </td>
             </tr>
 		</table>

@@ -44,7 +44,7 @@ asort( $photographers );
 	<?php if ( count( $entries ) == 0 ) { ?>
 
 		<h1>
-			Spokane Interstate Fair Photo Submissions
+			Submissions
 		</h1>
 
 		<div class="alert alert-danger">
@@ -562,7 +562,7 @@ asort( $photographers );
 	<?php } else { ?>
 
 		<h1>
-			Spokane Interstate Fair Photo Submissions
+			Submissions
 		</h1>
 
 		<form class="well form-inline" method="get">
@@ -618,6 +618,7 @@ asort( $photographers );
 				<tr>
 					<td><a href="admin.php?page=spokane_fair_submissions&sort=e.id&dir=<?php echo ( $sort == 'e.id' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">ID</a></td>
 					<td>Photo</td>
+                    <td>Dimensions</td>
 					<td>Code</td>
 					<td><a href="admin.php?page=spokane_fair_submissions&sort=e.title&dir=<?php echo ( $sort == 'e.title' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Title</a></td>
 					<td><a href="admin.php?page=spokane_fair_submissions&sort=c.title&dir=<?php echo ( $sort == 'c.title' && $dir == 'DESC' ) ? 'ASC' : 'DESC'; ?>">Category</a></td>
@@ -669,6 +670,13 @@ asort( $photographers );
 						<td>
 							<span class="spokane-fair-image" data-image="<?php echo $full[0]; ?>"><?php echo $thumb; ?></span>
 						</td>
+                        <td>
+                            <?php if ($entry->hasDimensions()) { ?>
+                                <?php echo $entry->getWidth(); ?>
+                                X
+                                <?php echo $entry->getHeight(); ?>
+                            <?php } ?>
+                        </td>
 						<td><?php echo $entry->getCode(); ?></td>
 						<td><?php echo $entry->getTitle(); ?></td>
 						<td><?php echo $entry->getCategory()->getTitle(); ?></td>

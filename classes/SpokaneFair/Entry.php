@@ -11,6 +11,8 @@ class Entry {
 	private $photographer_id;
 	private $category_id;
 	private $photo_post_id;
+	private $width;
+	private $height;
 	private $title;
 	private $is_finalist = FALSE;
 	private $composition_score;
@@ -56,6 +58,8 @@ class Entry {
 					'photographer_id' => $this->photographer_id,
 					'category_id' => $this->category_id,
 					'photo_post_id' => $this->photo_post_id,
+					'width' => $this->width,
+					'height' => $this->height,
 					'title' => $this->title,
 					'created_at' => $this->getCreatedAt( 'Y-m-d H:i:s' ),
 					'updated_at' => $this->getUpdatedAt( 'Y-m-d H:i:s' )
@@ -65,6 +69,8 @@ class Entry {
 					'%d',
 					'%d',
 					'%d',
+                    '%d',
+                    '%d',
 					'%s',
 					'%s',
 					'%s'
@@ -117,6 +123,8 @@ class Entry {
 			->setPhotographerId( $row->photographer_id )
 			->setCategoryId( $row->category_id )
 			->setPhotoPostId( $row->photo_post_id )
+            ->setWidth($row->width)
+            ->setHeight($row->height)
 			->setTitle( $row->title )
 			->setCreatedAt( $row->created_at )
 			->setUpdatedAt( $row->updated_at );
@@ -178,6 +186,8 @@ class Entry {
 					'photographer_id' => $this->photographer_id,
 					'category_id' => $this->category_id,
 					'photo_post_id' => $this->photo_post_id,
+					'height' => $this->height,
+					'width' => $this->width,
 					'title' => $this->title,
 					'is_finalist' => $this->is_finalist,
 					'composition_score' => $this->composition_score,
@@ -193,6 +203,8 @@ class Entry {
 					'%d',
 					'%d',
 					'%d',
+                    '%d',
+                    '%d',
 					'%d',
 					'%s',
                     '%d',
@@ -338,6 +350,50 @@ class Entry {
 
 		return $this;
 	}
+
+    /**
+     * @return bool
+     */
+	public function hasDimensions()
+    {
+        return ($this->width !== null && $this->height !== null);
+    }
+
+    /**
+     * @return int
+     */
+    public function getWidth()
+    {
+        return ($this->width === null) ? 0 : $this->width;
+    }
+
+    /**
+     * @param mixed $width
+     * @return Entry
+     */
+    public function setWidth($width)
+    {
+        $this->width = ( is_numeric( $width ) ) ? intval( $width ) : NULL;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHeight()
+    {
+        return ($this->height === null) ? 0 : $this->height;
+    }
+
+    /**
+     * @param mixed $height
+     * @return Entry
+     */
+    public function setHeight($height)
+    {
+        $this->height = ( is_numeric( $height ) ) ? intval( $height ) : NULL;
+        return $this;
+    }
 
 	/**
 	 * @param bool $url_format
@@ -596,7 +652,8 @@ class Entry {
 				LEFT JOIN " . $wpdb->prefix . Category::TABLE_NAME . " c
 					ON e.category_id = c.id
 			WHERE
-				e.photographer_id = %d",
+				e.photographer_id = %d
+			ORDER BY e.id DESC",
 			$photographer_id
 		);
 

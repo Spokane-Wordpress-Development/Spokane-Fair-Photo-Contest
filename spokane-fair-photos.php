@@ -1,15 +1,12 @@
 <?php
 
 /**
- * Plugin Name: Spokane Interstate Fair Photo Submissions
- * Plugin URI: http://8feetacross.com/spokane-interstate-fair-photo-contest/
- * Description: A custom plugin for the Spokane Interstate Fair Photo Contest
- * Author: Spokane WordPress Development
- * Author URI: http://www.spokanewp.com
- * Version: 1.1.0
+ * Plugin Name: Photo Contest Manager
+ * Description: A Photo Contest Manager Plugin
+ * Version: 1.2.0
  * Text Domain: spokane-fair
  *
- * Copyright 2016 Spokane WordPress Development
+ * Copyright 2019 Photo Contest Manager
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
@@ -69,23 +66,23 @@ if (is_admin() )
 	add_action( 'personal_options_update', array( $controller, 'save_extra_profile_fields' ) );
 	add_action( 'edit_user_profile_update', array( $controller, 'save_extra_profile_fields' ) );
 
-	add_action( 'wp_ajax_spokane_fair_category_add', function() use ( $controller ) 
-	{
+	add_action( 'wp_ajax_spokane_fair_category_add', function() use ( $controller ) {
 		$controller->add_category();
 	} );
 
-	add_action( 'wp_ajax_spokane_fair_category_update', function() use ( $controller )
-	{
+	add_action( 'wp_ajax_spokane_fair_category_update', function() use ( $controller ) {
 		$controller->update_category();
 	} );
 
-	add_action( 'wp_ajax_spokane_fair_category_delete', function() use ( $controller )
-	{
+    add_action( 'wp_ajax_spokane_fair_category_bulk', function() use ( $controller ) {
+        $controller->bulk_update_categories();
+    } );
+
+	add_action( 'wp_ajax_spokane_fair_category_delete', function() use ( $controller ) {
 		$controller->delete_category();
 	} );
 
-    add_action( 'wp_ajax_spokane_fair_entry_update', function() use ( $controller )
-    {
+    add_action( 'wp_ajax_spokane_fair_entry_update', function() use ( $controller ) {
         $controller->update_entry();
     } );
 }

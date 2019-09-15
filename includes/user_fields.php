@@ -14,7 +14,7 @@ $query = new WP_Query( $args );
 
 ?>
 
-<h3>Spokane Fair Extra User Data</h3>
+<h3>Photo Contest Manager Extra User Data</h3>
 
 <table class="form-table">
 

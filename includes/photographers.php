@@ -97,7 +97,7 @@ if ( isset( $_GET[ 'action' ] ) )
 				<tr>
 					<th>Order Number</th>
 					<th>Date</th>
-					<th>Entries Purchased</th>
+					<th>Entries Obtained</th>
 					<th>Amount Due</th>
 					<th>Payment Info</th>
 					<th>Delete</th>
@@ -192,7 +192,7 @@ if ( isset( $_GET[ 'action' ] ) )
 	<?php } else { ?>
 
 		<h1>
-			Spokane Interstate Fair Photographers
+			Photographers
 		</h1>
 
 		<?php

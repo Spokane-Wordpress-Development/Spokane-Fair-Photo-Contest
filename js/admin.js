@@ -62,6 +62,55 @@
             }
         });
 
+        $('#spokane-fair-category-bulk').click(function(e){
+
+            e.preventDefault();
+            var categories = [];
+            var errors = [];
+
+            $('.spokane_fair_category_code').each(function(){
+
+                var id = $(this).data('id');
+                var title = $('#title'+id).val();
+                var code = $('#code'+id).val();
+
+                if (code.length === 0) {
+                    errors.push('Please enter a code for ID #' + id);
+                } else if (title.length === 0) {
+                    errors.push('Please enter a title for ID #' + id);
+                } else {
+                    categories.push({
+                        id: id,
+                        title: title,
+                        code: code,
+                        is_visible: $('#visible' + id).val()
+                    });
+                }
+            });
+
+            if (errors.length > 0) {
+                alert(errors[0]);
+            } else {
+
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        action: 'spokane_fair_category_bulk',
+                        categories: JSON.stringify(categories)
+                    },
+                    success: function() {
+                        location.href = '?page=spokane_fair_categories';
+                    },
+                    error: function() {
+                        alert('There was an error. Please try again.');
+                    }
+                });
+            }
+
+        });
+
         $('#spokane-fair-category-add').click(function(e){
 
             e.preventDefault();
