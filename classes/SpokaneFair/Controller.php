@@ -305,7 +305,7 @@ class Controller {
 							    $width = $image[0];
 							    $height = $image[1];
 
-								if ( $width > $this->getMaxWidth() && $height > $this->getMaxHeight() )
+								if ( $width > $this->getMaxWidth() || $height > $this->getMaxHeight() )
 								{
 									$this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
@@ -316,7 +316,7 @@ class Controller {
                                 $width = $image[1];
                                 $height = $image[0];
 
-								if ( $height > $this->getMaxHeight() && $width > $this->getMaxWidth() )
+								if ( $height > $this->getMaxHeight() || $width > $this->getMaxWidth() )
 								{
 									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
 								}
@@ -350,8 +350,8 @@ class Controller {
 										->setCategoryId( $category_id )
 										->setTitle( $title )
 										->setPhotoPostId( $attachment_id )
-                                        ->setHeight($height)
-                                        ->setWidth($width)
+                                        ->setHeight($image[1])
+                                        ->setWidth($image[0])
 										->create();
 
 									if ( $entry->getId() !== NULL )
@@ -453,8 +453,8 @@ class Controller {
 
 									$entry
                                         ->setPhotoPostId( $attachment_id )
-                                        ->setWidth($width)
-                                        ->setHeight($height);
+                                        ->setHeight($image[1])
+                                        ->setWidth($image[0]);
 								}
 								else
 								{
@@ -707,6 +707,9 @@ class Controller {
 	public function bulk_update_categories()
     {
         $categories = $_REQUEST['categories'];
+        if (strpos($categories, "\\\\\\") !== false) {
+            $categories = stripslashes($categories);
+        }
         $categories = str_replace('\"', '"', $categories);
         $categories = json_decode($categories, TRUE);
 
