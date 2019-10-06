@@ -125,7 +125,7 @@ class CategoryTable extends \WP_List_Table {
 		else
 		{
 			$sql .= "
-				ORDER BY c.id DESC";
+				ORDER BY c.code ASC";
 		}
 
 		$total_items = $wpdb->query($sql);

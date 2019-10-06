@@ -299,28 +299,13 @@ class Controller {
 						{
 							$image = getimagesize( $_FILES['file']['tmp_name'] );
 
-							/* landscape */
-							if ( $image[0] >= $image[1] )
-							{
-							    $width = $image[0];
-							    $height = $image[1];
+                            $width = $image[0];
+                            $height = $image[1];
 
-								if ( $width > $this->getMaxWidth() || $height > $this->getMaxHeight() )
-								{
-									$this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
-								}
-							}
-							/* portrait */
-							else
-							{
-                                $width = $image[1];
-                                $height = $image[0];
-
-								if ( $height > $this->getMaxHeight() || $width > $this->getMaxWidth() )
-								{
-									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
-								}
-							}
+                            if ( $width > $this->getMaxWidth() || $height > $this->getMaxHeight() )
+                            {
+                                $this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+                            }
 						}
 
 						if ( count( $this->errors ) == 0 )
@@ -406,28 +391,13 @@ class Controller {
 						{
 							$image = getimagesize( $_FILES['file']['tmp_name'] );
 
-							/* landscape */
-							if ( $image[0] >= $image[1] )
-							{
-							    $width = $image[0];
-							    $height = $image[1];
+							$width = $image[0];
+                            $height = $image[1];
 
-								if ( $width > $this->getMaxWidth() || $height > $this->getMaxHeight() )
-								{
-									$this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
-								}
-							}
-							/* portrait */
-							else
-							{
-                                $width = $image[1];
-                                $height = $image[0];
-
-								if ( $height > $this->getMaxHeight() || $width > $this->getMaxWidth() )
-								{
-									$this->addError( 'Portrait photos cannot exceed ' . $this->getMaxHeight() . ' pixels wide by ' . $this->getMaxWidth() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
-								}
-							}
+                            if ( $width > $this->getMaxWidth() || $height > $this->getMaxHeight() )
+                            {
+                                $this->addError( 'Landscape photos cannot exceed ' . $this->getMaxWidth() . ' pixels wide by ' . $this->getMaxHeight() . ' pixels tall. Yours is ' . $image[0] . ' X ' . $image[1] . ' pixels.' );
+                            }
 						}
 
 						if ( count( $this->errors ) == 0 && ! empty( $_FILES['file']['tmp_name'] ) )

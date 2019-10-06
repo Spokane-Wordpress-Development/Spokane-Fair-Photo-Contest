@@ -267,7 +267,7 @@ class Category {
         }
         $sql .= "
 			GROUP BY c.id
-			ORDER BY c.title";
+			ORDER BY c.code, c.title";
 
         $rows = $wpdb->get_results( $sql );
         foreach( $rows as $row )
