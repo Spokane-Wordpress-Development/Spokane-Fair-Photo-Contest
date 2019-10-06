@@ -198,6 +198,7 @@ asort( $photographers );
                             <?php
 
                             $data = array(
+                                'id' => null,
                                 'entry' => '',
                                 'composition' => 0,
                                 'impact' => 0,
@@ -228,6 +229,9 @@ asort( $photographers );
                                     case 'comments':
                                         $data['comments'] = $val;
                                         break;
+                                    case 'id':
+                                        $data['id'] = $val;
+                                        break;
                                 }
                             }
 
@@ -236,11 +240,25 @@ asort( $photographers );
 
                             if ( count( $parts ) > 1 )
                             {
-                                $code = preg_replace( '/[^0-9,.]/', '', $parts[0] );
-                                $entries = \SpokaneFair\Entry::getEntryByCode( $code );
-                                if ( count( $entries ) == 1 )
+                                // Load it by id, if id exists:
+                                if ( $data['id'] )
                                 {
-                                    $entry = array_values( $entries )[0];
+                                    $temp = new \SpokaneFair\Entry( $data['id'] );
+                                    if ( $temp->getId() )
+                                    {
+                                        $entry = $temp;
+                                    }
+                                }
+
+                                // If id didn't exist or it wasn't loaded, try loading by code:
+                                if ( ! $entry->getId() )
+                                {
+                                    $code = preg_replace('/[^0-9,.]/', '', $parts[0]);
+                                    $entries = \SpokaneFair\Entry::getEntryByCode($code);
+                                    if (count($entries) == 1)
+                                    {
+                                        $entry = array_values($entries)[0];
+                                    }
                                 }
                             }
 
