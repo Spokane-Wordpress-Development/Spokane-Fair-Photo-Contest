@@ -840,6 +840,8 @@ class Entry {
 	 */
 	public static function getPrice( $number_of_entries, $price_per_qty, $number_free_at, $free_qty )
 	{
+	    return $price_per_qty * $number_of_entries;
+
 		if ( $price_per_qty == 0 )
 		{
 			return 0;
