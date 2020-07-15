@@ -833,36 +833,12 @@ class Entry {
 	/**
 	 * @param $number_of_entries
 	 * @param $price_per_qty
-	 * @param $number_free_at
-	 * @param $free_qty
 	 *
 	 * @return int
 	 */
-	public static function getPrice( $number_of_entries, $price_per_qty, $number_free_at, $free_qty )
+	public static function getPrice( $number_of_entries, $price_per_qty )
 	{
 	    return $price_per_qty * $number_of_entries;
-
-		if ( $price_per_qty == 0 )
-		{
-			return 0;
-		}
-
-		$price = 0;
-		$y = 0;
-		
-		for ( $x=1; $x<=$number_of_entries; $x++ )
-		{
-			$y++;
-			$price += $price_per_qty;
-
-			if ( $y % $number_free_at == 0 )
-			{
-				$y=0;
-				$x += $free_qty;
-			}
-		}
-		
-		return $price;
 	}
 
     /**

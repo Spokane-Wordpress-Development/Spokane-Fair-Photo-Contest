@@ -97,7 +97,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						<tr>
 							<th>New Entries</th>
 							<td><?php echo $new_entries; ?></td>
-							<td>$<?php echo number_format( \SpokaneFair\Entry::getPrice( $new_entries, $this->getPricePerEntry(), $this->getNumberFreeAt(), $this->getFreeQty() ), 2 ); ?></td>
+							<td>$<?php echo number_format( \SpokaneFair\Entry::getPrice( $new_entries, $this->getPricePerEntry() ), 2 ); ?></td>
 						</tr>
 						<?php if ( $new_free > 0 ) { ?>
 							<tr>
@@ -112,7 +112,7 @@ if ( $action == 'delete-order' && isset( $_GET['id'] ) )
 						<tr>
 							<th>Grand Total</th>
 							<th><?php echo number_format( $new_entries + $new_free ); ?></th>
-							<td>$<?php echo number_format( \SpokaneFair\Entry::getPrice( $new_entries, $this->getPricePerEntry(), $this->getNumberFreeAt(), $this->getFreeQty() ), 2 ); ?></td>
+							<td>$<?php echo number_format( \SpokaneFair\Entry::getPrice( $new_entries, $this->getPricePerEntry() ), 2 ); ?></td>
 						</tr>
 					</table>
 
